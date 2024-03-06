@@ -14,3 +14,6 @@ void f(vector <int> input_set, vector <int> subset, int i){
 Prints all subsets of a set 
 
 ** Pass in an empty vector "subset" and i=0 **
+
+When i == input_set.size() ==> one of the many subsets has been formed  ==> you can either print it or simply return it or 
+push it into a universal set
