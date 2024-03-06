@@ -1,6 +1,4 @@
-#include <bits/stdc++.h>
-using namespace std;
-void f(vector <int> input_set, vector <int> subset, int i){
+void f(vector <int> input_set, vector <int> subset, int i){    
     if (i == input_set.size()){
         for (auto it:subset){
             cout<<it<<" ";
@@ -12,9 +10,7 @@ void f(vector <int> input_set, vector <int> subset, int i){
         f(input_set, subset, i+1);
     }
 }
-int main(){
-    vector <int> input_set = {1,2,3,4};
-    vector <int> subset;
-    f(input_set, subset, 0);
-    return 0;
-}
+
+Prints all subsets of a set 
+
+** Pass in an empty vector "subset" and i=0 **
