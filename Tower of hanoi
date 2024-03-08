@@ -1,0 +1,27 @@
+#include <bits/stdc++.h>
+using namespace std;
+void toh(char a, char c, char b, int n){
+    if (n == 0){
+        return ;
+    }
+    toh(a, b, c, n-1);
+    cout<<"Move disc "<<n<<" from rod "<<a<<" to rod "<<c<<endl;
+    toh(b, c, a, n-1);
+}
+int main(){
+    toh('A', 'C', 'B', 3);
+    return 0;
+}
+Firstly we assume that the function toh(a, c, b, n) moves n discs from rod a to rod c taking help of rod b. 
+Here we do not know how it works but we just TRUST that our function will do the task somehow.
+
+**This initial trust is known as recursive leap of faith. This is the core idea behind many recursive algorithms. We trust that our function will work as expected
+  without even knowing how it'll work.**
+
+After this we break our initial task into a slightly smaller task of moving n-1 discs from rod a to b and then moving the nth disc from rod a to c.
+We assume that all n-1 discs are on rod b and nth disc on rod c. Then we again call the function to move those remaining n-1 discs to their right place.
+We define the base case in the end. 
+
+So this is the intuition behind such recursive algorithms : 
+Trust that your function will work as expected without even knowing how its gonna work => Break your initial task into a slightly smaller task =>
+Take a recursive leap of faith and call the function in these parts => Check for any base cases in the end
