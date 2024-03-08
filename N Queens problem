@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+using namespace std;
+void search(int n, vector <int> col, vector <int> diag1, vector <int> diag2, int& count, int row = 0){
+    if (row == n){
+        count++;
+    } else {
+        for (int i=0; i<n; i++){
+        if (col[i] or diag1[i + row] or diag2[i - row + n - 1]) continue;    //all unsafe positons are ignored
+        col[i] = diag1[i + row] = diag2[i - row + n - 1] = 1;               
+        search(n, col, diag1, diag2, count, row + 1);
+        col[i] = diag1[i + row] = diag2[i - row + n - 1] = 0;
+        }
+    }
+        
+}
+int main(){
+    int n = 8;
+    vector <int> col(2*(n-1), 0);
+    vector <int> diag1(2*(n-1), 0);
+    vector <int> diag2(2*(n-1), 0);
+    int count = 0;
+    search(n, col, diag1, diag2, count);
+    cout<<count;
+    return 0;
+}
+
+This algorithm takes in an external variable count, modifies it in place and makes its equal to the number of ways in which queens can be placed on chessboard.
+This algorithms works as follows:
+Firstly we create column index and diagnol index in order to keep track of boxes that are prone to attack. 
+
+For column index its pretty straightforward, the columns to avoid are actually equal to the columns in which queens are placed.
+
+For diagnols the logic is a bit tricky. 
+Now there are two types of diagnols on a chessboard. Let us consider diagnols that make +45deg with +ve x axis.
+If we observe all the boxes that lie on a diagnol line (any diagnol), we see that sum of coordinates of each box along diagnol remain constant. Let us now assign this sum 
+to the diagnol and call it the diagnol index.
+Moreover for each diagnol this sum is distinct. Therefore this unique sum can be used to identify a particular diagnol and therefore becomes index of that diagnol. 
+Moreover this unique sum can be used to avoid placing elements on that diagnol line. Similarly we have a condition for other type of diagnol.
+
+The whole motive of creating such indexes is to keep track of indexes to avoid. It can thought of as:
+Suppose you place your queen on any position (x,y) on chessboard. Now you cannot place another queen (which you'll obviously place in another row) in same column as y
+and same diagnols whose diagnol indexes are : x+y and x-y+n-1 {both these results are simply based on observation}.
+
+The col vector keeps track of col indexes to avoid. The diag vector keeps track of diagnol indexes to avoid. As this function works recursively, at each step
+preceeding col and diag indexes are kept into account and are then accordingly updated. Each recursion call means moving to the next row. In each row we explore all
+boxes (for loop) and place our queen at safe places. 
+
+Finally we remove all the modfications we made to the col and diag indexes in order to try out different combinations.
