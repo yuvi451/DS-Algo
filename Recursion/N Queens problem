@@ -25,6 +25,7 @@ int main(){
 }
 
 This algorithm takes in an external variable count, modifies it in place and makes its equal to the number of ways in which queens can be placed on chessboard.
+
 This algorithms works as follows:
 Firstly we create column index and diagnol index in order to keep track of boxes that are prone to attack. 
 
@@ -32,7 +33,7 @@ For column index its pretty straightforward, the columns to avoid are actually e
 
 For diagnols the logic is a bit tricky. 
 Now there are two types of diagnols on a chessboard. Let us consider diagnols that make +45deg with +ve x axis.
-If we observe all the boxes that lie on a diagnol line (any diagnol), we see that sum of coordinates of each box along diagnol remain constant. Let us now assign this sum 
+If we observe all the boxes that lie on a diagnol line (any diagnol), we see that sum of coordinates (x+y) of each box along diagnol remain constant. Let us now assign this sum 
 to the diagnol and call it the diagnol index.
 Moreover for each diagnol this sum is distinct. Therefore this unique sum can be used to identify a particular diagnol and therefore becomes index of that diagnol. 
 Moreover this unique sum can be used to avoid placing elements on that diagnol line. Similarly we have a condition for other type of diagnol.
