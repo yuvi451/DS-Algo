@@ -42,7 +42,7 @@ The whole motive of creating such indexes is to keep track of indexes to avoid. 
 Suppose you place your queen on any position (x,y) on chessboard. Now you cannot place another queen (which you'll obviously place in another row) in same column as y
 and same diagnols whose diagnol indexes are : x+y and x-y+n-1 {both these results are simply based on observation}.
 
-The col vector keeps track of col indexes to avoid. The diag vector keeps track of diagnol indexes to avoid. As this function works recursively, at each step
+The col vector keeps track of column indexes to avoid. The diag vector keeps track of diagnol indexes to avoid. As this function works recursively, at each step
 preceeding col and diag indexes are kept into account and are then accordingly updated. Each recursion call means moving to the next row. In each row we explore all
 boxes (for loop) and place our queen at safe places. 
 
