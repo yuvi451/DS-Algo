@@ -17,3 +17,8 @@ Prints all subsets of a set
 
 When i == input_set.size() ==> one of the many subsets has been formed  ==> you can either print it or simply return it or 
 push it into a universal set
+
+The thinking behind this is:
+Assume that the function 'f' returns all subsets containing element at index i. Now this can be broken as: store element at index i
+in vector subset and then store all possible subsets (formed from remaining elements) in that set. Finally remove that i-th element from 
+the set and repeat the same for i+1 th element.
