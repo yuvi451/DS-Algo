@@ -1,0 +1,37 @@
+int solve(int n, vector <int> coins, vector <int> temp, vector <vector<int>>& ans){
+    if (n == 0) {
+        sort(temp.begin(), temp.end());
+        if (find(ans.begin(), ans.end(), temp) == ans.end() or ans.size() == 0) ans.push_back(temp);
+        return 0;
+    } 
+    if (n < 0) return 0;
+    for (auto it: coins){
+        temp.push_back(it);
+        solve(n - it, coins, temp, ans);
+        temp.pop_back();
+    }
+    return 0;
+}
+
+Calling this function:
+
+    vector <int> coins = {1, 2, 3, 4};
+    vector <int> temp;
+    vector <vector<int>> ans;
+    solve(n, coins, temp, ans);
+    int min_size = INT_MAX;
+    for (auto it: ans){
+        int size = it.size();
+        min_size = min(min_size, size);
+    }
+    for (auto it: ans){
+        int size = it.size();
+        if (size == min_size){
+            for (auto it1: it){
+                cout<<it1<<" ";
+            } cout<<endl;
+        }
+    }
+
+**The function solve modifies the vector ans in place and stores all possible ways in which sum N can be achieved.
+  Here i used find function of c++ that checks whether vector temp already exists in vector ans or not.**
