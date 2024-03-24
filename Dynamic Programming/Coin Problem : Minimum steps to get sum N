@@ -18,6 +18,8 @@ vector <int> coins = {1, 3, 4};
 
 --Recursive Approach--
 
+--Minimum number of steps == Minimum number of times function needs to be called--
+
 int solve(int n, vector <int> coins, vector <int> ans){
     if (ans[n]) return ans[n];        
     if (n == 0) return 0;
