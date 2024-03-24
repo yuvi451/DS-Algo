@@ -1,3 +1,6 @@
+
+--Recursive Apporoach--
+
 int solve(int n, vector <int> coins, vector <int> temp, vector <vector<int>>& ans){
     if (n == 0) {
         sort(temp.begin(), temp.end());
