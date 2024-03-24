@@ -1,5 +1,24 @@
+    vector <int> coins = {1,3,4};
+    int n = 10;
+    vector <int> first(n + 1, 0);
+    vector <int> value(n+1, 0);
+    for (int i=1; i<=n; i++){
+        value[i] = INT16_MAX;
+        for (auto it: coins){
+            if (i-it >= 0 and value[i-it] + 1 < value[i]){     //if for any 'it' you get 1+value[i-it] i.e. number of coins required less than you chose currently
+                value[i] = value[i-it] + 1;                    // then you update your solution. In that case 'it' would be the first coin in optimal solution.
+                first[i] = it;
+            }
+        }
+    }
+    while (n > 0){
+        cout<<first[n]<<" ";
+        n -= first[n];
+    }
 
---Recursive Apporoach--
+**vector 'first' indicates for each sum of money the first coin in an optimal solution. Value store the minimum number of steps to get sum N**
+
+--Recursive Approach--
 
 int solve(int n, vector <int> coins, vector <int> temp, vector <vector<int>>& ans){
     if (n == 0) {
