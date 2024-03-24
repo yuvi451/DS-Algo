@@ -1,17 +1,20 @@
 vector <int> coins = {1, 3, 4};
     int n = 3;
-    vector <int> value(n + 1, 0);
-    for (int i=1; i<=n; i++){
-        value[i] = INT16_MAX;           
+    vector <int> value(n + 1, 0);        
+    for (int i=1; i<=n; i++){           // 'i' indicates the sum we want to achieve
+        value[i] = INT16_MAX;           //Initialises the first elemen
         for (auto it: coins){
-            if (i - it >= 0){
-                value[i] = min(value[i], 1 + value[i - it]);
+            if (i - it >= 0){           //checks whether coin with value 'it' can be chosen
+                value[i] = min(value[i], 1 + value[i - it]);        //this system works in such a way that all values preceding 'i' have been calculated at first.
             }
         }
     }
     cout<<value[n];
 
-**Value vector stores minimum number of steps to get sum N. Initialising value vector to zero is important.**
+**Value vector stores minimum number of steps to get sum N. Initialising value vector to zero is important.
+  The key thing to understand here is memoization. We basically store solution to each smaller problem / intermediate step in 'value' vector and use it directly while 
+  calculating newer results. This reusability saves us a lot of time. This memoization is done very systematically. We start from the first element
+  and move our way up to the last.**
 
 --Recursive Approach--
 
