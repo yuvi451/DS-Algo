@@ -1,7 +1,7 @@
     vector <int> coins = {1,3,4};
     int n = 10;
     vector <int> first(n + 1, 0);
-    vector <int> value(n+1, 0);
+    vector <int> value(n+1, 0);                        //stores minimum number of coins required to get sum N
     for (int i=1; i<=n; i++){
         value[i] = INT16_MAX;
         for (auto it: coins){
