@@ -1,3 +1,5 @@
+    //Can detect negative cycles
+
     int size = number_of_nodes;
     int start = starting_node;
     int end = ending_node;
