@@ -1,4 +1,3 @@
-//BFS approach: Works for both directed and undirected graphs
     int size = number_of_nodes
     vl adj[size + 1]; // adjacency list  
     vl visited(size + 1); 
@@ -22,3 +21,5 @@
   //ans vector stores bfs ordering; 
   //BFS is a level by level search algorithm i.e. we first look for all elements that are at distance x from starting node and then only look for elements 
   //that are at disatance x + 1 from start [Breadth/Horizontal First Search]
+  //Unlike DFS it picks up a neighbour (adjacent element), visits it and then goes on to the next neighbour (which is also at same distance from start)
+  
