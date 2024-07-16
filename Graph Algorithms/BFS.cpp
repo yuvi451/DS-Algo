@@ -1,4 +1,4 @@
-//BFS approach : Works for both directed and undirected graphs
+//BFS approach: Works for both directed and undirected graphs
     int size = number_of_nodes
     vl adj[size + 1]; // adjacency list  
     vl visited(size + 1); 
