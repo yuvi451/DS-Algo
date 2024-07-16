@@ -18,18 +18,28 @@
 
     vl distance(n + 1, inf);
     distance[start] = 0;
-    vl visited(n + 1);
-    queue <int> q;
-    q.push(start);
-    visited[start] = 1;
-    while (q.size() != 0){
-        int node = q.front();
-        q.pop();
+
+    //here instead of a queue we use a deque. A deque is basically a faster queue.
+
+    vl in_deque(n + 1);
+    deque <int> dq;
+    dq.push_back(start);
+    in_deque[start] = 1;
+
+    while (dq.size() != 0){
+        int node = dq.front();
+        dq.pop_front();
+        in_deque[node] = 0;
+        
         fora(x, adj[node]){
-            if (!(visited[x[0]])){
-                visited[x[0]] = 1;
-                q.push(x[0]);
-            }
+            if (!in_deque[x[0]]){
+                    if (!dq.empty() && distance[x[0]] < distance[dq.front()]){
+                        dq.push_front(x[0]);
+                    } else {
+                        dq.push_back(x[0]);
+                    }
+                    in_deque[x[0]] = 1;
+                }
             distance[x[0]] = min(distance[x[0]], x[1] + distance[node]);
         }
     }
