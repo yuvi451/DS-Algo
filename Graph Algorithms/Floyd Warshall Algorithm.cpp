@@ -1,7 +1,7 @@
-
 void FloydWarshall(vvl edges, vvl& distance, int nodes){
     fora(x, edges){
         distance[x[0]][x[1]] = x[2];
+        distance[x[1]][x[0]] = x[2];
     }
 
     forl(i, 0, nodes + 1){
@@ -20,6 +20,7 @@ void FloydWarshall(vvl edges, vvl& distance, int nodes){
         }
     }
 }
+
 
     //inputs
     vvl distance(nodes + 1, vl(nodes + 1, inf));
