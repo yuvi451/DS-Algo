@@ -1,6 +1,6 @@
 void SPFA(vvl edges, int nodes, vl& distance, int start, int&r){
     distance[start] = 0;
-    vector <vvl> adj(nodes + 1);
+    vector <vpr> adj(nodes + 1);
     fora(x, edges){
         adj[x[0]].pb({x[1], x[2]});
     }
@@ -20,18 +20,18 @@ void SPFA(vvl edges, int nodes, vl& distance, int start, int&r){
 
         fora(x, adj[node]){
 
-            distance[x[0]] = min(distance[x[0]], distance[node] + x[1]);
+            distance[x.first] = min(distance[x.first], distance[node] + x.second);
             
-            if (!(in_deque[x[0]])){
-                if (!(dq.empty()) && distance[x[0]] < distance[dq.front()]){
-                    dq.push_front(x[0]);
+            if (!(in_deque[x.first])){
+                if (!(dq.empty()) && distance[x.first] < distance[dq.front()]){
+                    dq.push_front(x.first);
                 } else {
-                    dq.push_back(x[0]);
+                    dq.push_back(x.first);
                 }
-                in_deque[x[0]] = 1;
+                in_deque[x.first] = 1;
 
-                update_count[x[0]]++;
-                if (update_count[x[0]] > nodes) {
+                update_count[x.first]++;
+                if (update_count[x.first] > nodes) {
                     r = 1;
                     return;
                 }
