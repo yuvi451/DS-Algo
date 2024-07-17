@@ -1,34 +1,40 @@
-  //Can detect negative cycles if adj_matrix[i][i] < 0 
 
-    int n = 5; // number of nodes / size of graph
-
-    vector<pr> adj[n + 1];
-    adj[1] = {{5, 1}, {2, 5}, {4, 9}};
-    adj[2] = {{1, 5}, {3, 2}};
-    adj[3] = {{2, 2}, {4, 7}};
-    adj[4] = {{3, 7}, {5, 2}, {1, 9}};
-    adj[5] = {{4, 2}, {1, 1}};
-
-    vvl adj_matrix(n + 1, vl(n + 1, inf));
-
-    //adjacency list to adjacency matrix conversion. If adjacency matrix is given directly copy it and replace all zeroes with infinity
-
-    forl(i, 1, n + 1){
-        adj_matrix[i][i] = 0;
-        fora(x, adj[i]){
-            adj_matrix[i][x.first] = x.second;
-        }
+void FloydWarshall(vvl edges, vvl& distance, int nodes){
+    fora(x, edges){
+        distance[x[0]][x[1]] = x[2];
     }
 
-    //Actual algorithm
+    forl(i, 0, nodes + 1){
+        distance[i][i] = 0; 
+    }
 
-    forl(k, 1, n + 1){
-        forl(i, 1, n + 1){
-            forl(j, 1, n + 1){
-                adj_matrix[i][j] = min(adj_matrix[i][j], adj_matrix[i][k] + adj_matrix[k][j]);
+    //nodes are 1 base indexed
+
+    forl(k, 1, nodes + 1){
+        forl(i, 1, nodes + 1){
+            forl(j, 1, nodes + 1){
+                if (distance[i][k] < inf && distance[k][j] < inf){
+                    distance[i][j] = min(distance[i][j], distance[i][k] + distance[k][j]);
+                }
             }
         }
     }
+}
+
+    //inputs
+    vvl distance(nodes + 1, vl(nodes + 1, inf));
+
+    //Can detect negative cycles if distance[i][i] < 0 
+
+    //adjacency list to adjacency matrix conversion. 
+    forl(i, 1, n + 1){
+        distance[i][i] = 0;
+        fora(x, adj[i]){
+            distance[i][x[0]] = x[1];
+        }
+    }
+
+    //If adjacency matrix is given directly copy it and replace all zeroes with infinity
 
     //Time complexity = O(n^3)
     //Best suited for dense graphs and when you need shortest paths between all pairs of vertices. It works for graphs with both positive 
