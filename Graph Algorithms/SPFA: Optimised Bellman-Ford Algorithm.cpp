@@ -41,8 +41,10 @@ void SPFA(vvl edges, int nodes, vl& distance, int start, int&r){
 }
 
     //inputs
-    //vl distance(nodes + 1, inf);
-    //int r = 0;  for checking negative cycles (if r == 1)
+    vl distance(nodes + 1, inf);
+    int r = 0;  
+
+    //for checking negative cycles (if r == 1)
 
     //adjacency list: adj[a] = {{b, w}, {b1, w1}, ...} : all edges from node a, that end at b & have weight w
     //here instead of a queue we use a deque. A deque is basically a faster queue.
