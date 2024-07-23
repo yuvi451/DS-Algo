@@ -17,6 +17,8 @@ void dfs1(vvl adj, vl& in, int root, int prev_root = -1){
 out[x] = the longest path from each node to any node outside its subtree
 out[x] = max(1 + out[root/parent], 2 + in[v]) where v is a sibling of x
 We have in[v] calculated from above
+And we also have out[root] from previous steps
+Now we just need to explore the possibility where maximum distance can go through siblings of node x
 */
  
 
