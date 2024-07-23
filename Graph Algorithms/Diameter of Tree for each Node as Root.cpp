@@ -72,3 +72,5 @@ void dfs2(vvl adj, vl in, vl& out, int root, int prev_root = 0){
     forl(i, 1, n + 1){
         cout<<i<<" "<<max(in[i], out[i])<<"\n";
     }
+
+// Time complexity = O(N)
