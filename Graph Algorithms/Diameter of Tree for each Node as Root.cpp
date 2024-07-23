@@ -15,7 +15,8 @@ void dfs1(vvl adj, vl& in, int root, int prev_root = -1){
 
 /*
 out[x] = the longest path from each node to any node outside its subtree
-out[x] = max(1 + out[parent], 2 + in[v]) where v is a sibling of x
+out[x] = max(1 + out[root/parent], 2 + in[v]) where v is a sibling of x
+We have in[v] calculated from above
 */
  
 
@@ -51,6 +52,11 @@ void dfs2(vvl adj, vl in, vl& out, int root, int prev_root = 0){
                 use = mx2;
             }
             out[x] = max(1 + out[root], 2 + use);
+            /* This a bottom-up approach i.e. we calculate lower values first to calculate higher values
+            
+               The logic is simple if we out[root] for a particular root then we can use it to calculate out[child] for 
+               each of its children
+            */
             dfs2(adj, in, out, x, root);
         }
     }
