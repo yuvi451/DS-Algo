@@ -1,2 +1,2 @@
 # DS-Algo
-All important Data-Structures and Algorithms for Competitive Programming
+All important Algorithms for Competitive Programming
