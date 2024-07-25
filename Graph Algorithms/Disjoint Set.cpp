@@ -28,23 +28,21 @@ class DisjointSet{
             rank[ult_v]++;
         }
     }
+
+    void UnionBySize(int u, int v){
+            int ult_u = findUltPar(u);
+            int ult_v = findUltPar(v);
+            if (ult_u == ult_v) return;
+            else if (size[ult_u] > size[ult_v]){
+                parent[ult_v] = ult_u;
+                size[ult_u] += size[ult_v];
+            } else if (size[ult_u] < size[ult_v]){
+                parent[ult_u] = ult_v;
+                size[ult_v] += size[ult_u];
+            } else {
+                parent[ult_u] = ult_v;
+                size[ult_v] += size[ult_u];
+            }
+        }
 };
 
-
-  UNION BY SIZE 
-
-void UnionBySize(int u, int v){
-        int ult_u = findUltPar(u);
-        int ult_v = findUltPar(v);
-        if (ult_u == ult_v) return;
-        else if (size[ult_u] > size[ult_v]){
-            parent[ult_v] = ult_u;
-            size[ult_u] += size[ult_v];
-        } else if (size[ult_u] < size[ult_v]){
-            parent[ult_u] = ult_v;
-            size[ult_v] += size[ult_u];
-        } else {
-            parent[ult_u] = ult_v;
-            size[ult_v] += size[ult_u];
-        }
-    }
