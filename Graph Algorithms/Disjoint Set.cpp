@@ -1,4 +1,4 @@
-// Finds whether two elements belong to the same component or not in O(1) time
+// Finds whether two elements belong to the same component or not in O(4*alpha) == O(1) time
 // if (ds.findUtlPar(i) == ds.findUltPar(j)) then i & j belong to the same component
 class DisjointSet{
     vl rank, parent, size;
