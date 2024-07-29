@@ -43,4 +43,4 @@ vvl edges;
 
 // intuition of this algorithm : Greedy 
 // Time complexity = O(n + m*log(m))
-//here forming the adjacency list also takes up some time. If it is already given then that time is savec
+//here forming the adjacency list also takes up some time. If it is already given then that time is saved
