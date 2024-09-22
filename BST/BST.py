@@ -39,21 +39,18 @@ class Node:
     def delete(self, value):
         if value < self.value:
             if self.left:
-                self.left = self.left.delete(value)  # Recurse into left subtree : left node = .... recurive_fn()
+                self.left = self.left.delete(value)
         elif value > self.value:
             if self.right:
-                self.right = self.right.delete(value)  # Recurse into right subtree : right node = .... recursive_fn()
+                self.right = self.right.delete(value)
         else:
-            # Node to be deleted is found
-            if self.left is None:  # Case 1: No left child, or Case 2: Only right child
-                return self.right   # if No right node : returns None otherwise right node
-            elif self.right is None:  # Case 2: Only left child
-                return self.left     # if No left node : returns None otherwise left node
-            # Case 3: Node has two children
-            min_larger_node = self._min_value_node(self.right)  # In-order successor
-            self.value = min_larger_node.value  # Replace node's value with successor's value
-            self.right = self.right.delete(min_larger_node.value)  # Delete the in-order successor
-
+            if self.left is None:
+                return self.right
+            elif self.right is None:
+                return self.left
+            min_larger_node = self._min_value_node(self.right)
+            self.value = min_larger_node.value
+            self.right = self.right.delete(min_larger_node.value)  
         return self
 
     def _min_value_node(self, node):
@@ -63,7 +60,7 @@ class Node:
         return current
 
 
-class BST(Node):
+class BST:
     def __init__(self):
         self.root = None
 
