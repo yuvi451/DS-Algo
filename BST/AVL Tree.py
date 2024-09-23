@@ -1,174 +1,121 @@
 class Node:
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, key):
+        self.key = key
         self.left = None
         self.right = None
         self.height = 1
-
-    def insert(self, value):
-        if value < self.value:
-            if self.left:
-                self.left.insert(value)
-            else:
-                self.left = Node(value)
-        else:
-            if self.right:
-                self.right.insert(value)
-            else:
-                self.right = Node(value)
-
-        # Update the height of the current node
-        self.height = 1 + max(self._get_height(self.left), self._get_height(self.right))
-
-        # Balance the node if it's unbalanced
-        balance = self._get_balance()
-
-        # Left Left Case
-        if balance > 1 and value < self.left.value:
-            return self.right_rotate()
-
-        # Right Right Case
-        if balance < -1 and value > self.right.value:
-            return self.left_rotate()
-
-        # Left Right Case
-        if balance > 1 and value > self.left.value:
-            self.left = self.left.left_rotate()
-            return self.right_rotate()
-
-        # Right Left Case
-        if balance < -1 and value < self.right.value:
-            self.right = self.right.right_rotate()
-            return self.left_rotate()
-
-        return self
-
-    def inorder_traversal(self):
-        if self.left:
-            self.left.inorder_traversal()
-        print(self.value)
-        if self.right:
-            self.right.inorder_traversal()
-
-    def find(self, value):
-        if value == self.value:
-            return True
-        elif value < self.value:
-            if self.left:
-                return self.left.find(value)
-            else:
-                return False
-        else:
-            if self.right:
-                return self.right.find(value)
-            else:
-                return False
-
-    def delete(self, value):
-        if value < self.value:
-            if self.left:
-                self.left = self.left.delete(value)
-        elif value > self.value:
-            if self.right:
-                self.right = self.right.delete(value)
-        else:
-            if self.left is None:
-                return self.right
-            elif self.right is None:
-                return self.left
-            min_larger_node = self._min_value_node(self.right)
-            self.value = min_larger_node.value
-            self.right = self.right.delete(min_larger_node.value)
-
-        if not self:
-            return None
-
-        # Update the height
-        self.height = 1 + max(self._get_height(self.left), self._get_height(self.right))
-
-        # Balance the node
-        balance = self._get_balance()
-
-        # Left Left Case
-        if balance > 1 and self._get_balance(self.left) >= 0:
-            return self.right_rotate()
-
-        # Left Right Case
-        if balance > 1 and self._get_balance(self.left) < 0:
-            self.left = self.left.left_rotate()
-            return self.right_rotate()
-
-        # Right Right Case
-        if balance < -1 and self._get_balance(self.right) <= 0:
-            return self.left_rotate()
-
-        # Right Left Case
-        if balance < -1 and self._get_balance(self.right) > 0:
-            self.right = self.right.right_rotate()
-            return self.left_rotate()
-
-        return self
-
-    def _min_value_node(self, node):
-        current = node
-        while current.left is not None:
-            current = current.left
-        return current
-
-    def _get_height(self, node):
-        if not node:
-            return 0
-        return node.height
-
-    def _get_balance(self):
-        return self._get_height(self.left) - self._get_height(self.right)
-
-    def left_rotate(self):
-        y = self.right
-        T2 = y.left
-
-        # Perform rotation
-        y.left = self
-        self.right = T2
-
-        # Update heights
-        self.height = 1 + max(self._get_height(self.left), self._get_height(self.right))
-        y.height = 1 + max(self._get_height(y.left), self._get_height(y.right))
-
-        return y
-
-    def right_rotate(self):
-        y = self.left
-        T3 = y.right
-
-        # Perform rotation
-        y.right = self
-        self.left = T3
-
-        # Update heights
-        self.height = 1 + max(self._get_height(self.left), self._get_height(self.right))
-        y.height = 1 + max(self._get_height(y.left), self._get_height(y.right))
-
-        return y
-
 
 class AVLTree:
     def __init__(self):
         self.root = None
 
-    def insert(self, value):
-        if self.root is None:
-            self.root = Node(value)
+    def _height(self, node):
+        if not node:
+            return 0
+        return node.height
+
+    def _right_rotate(self, y):
+        x = y.left
+        T2 = x.right
+
+        x.right = y
+        y.left = T2
+
+        y.height = 1 + max(self._height(y.left), self._height(y.right))
+        x.height = 1 + max(self._height(x.left), self._height(x.right))
+
+        return x
+
+    def _left_rotate(self, x):
+        y = x.right
+        T2 = y.left
+
+        y.left = x
+        x.right = T2
+
+        x.height = 1 + max(self._height(x.left), self._height(x.right))
+        y.height = 1 + max(self._height(y.left), self._height(y.right))
+
+        return y
+
+    def insert(self, root, key):
+        if not root:
+            return Node(key)
+        elif key < root.key:
+            root.left = self.insert(root.left, key)
         else:
-            self.root = self.root.insert(value)
+            root.right = self.insert(root.right, key)
 
-    def inorder_traversal(self):
-        if self.root:
-            self.root.inorder_traversal()
+        root.height = 1 + max(self._height(root.left), self._height(root.right))
 
-    def find(self, value):
-        return self.root.find(value) if self.root else False
+        balance = self._height(root.left) - self._height(root.right)
 
-    def delete(self, value):
-        if self.root:
-            self.root = self.root.delete(value)
+        if balance > 1 and key < root.left.key:
+            return self._right_rotate(root)
+
+        if balance < -1 and key > root.right.key:
+            return self._left_rotate(root)
+
+        if balance > 1 and key > root.left.key:
+            root.left = self._left_rotate(root.left)
+            return self._right_rotate(root)
+
+        if balance < -1 and key < root.right.key:
+            root.right = self._right_rotate(root.right)
+            return self._left_rotate(root)
+
+        return root
+
+    def _minimum_left_node_on_right_subtree(self, node):
+        x = node.right
+        while x.left is not None:
+            x = x.left
+        return x
+
+    def delete(self, root, key):
+        if not root:
+            return root
+        elif key < root.key:
+            root.left = self.delete(root.left, key)
+        elif key > root.key:
+            root.right = self.delete(root.right, key)
+        else:
+            if root.left is None:
+                return root.right
+            elif root.right is None:
+                return root.left
+
+            temp = self._minimum_left_node_on_right_subtree(root)
+            root.key = temp.key
+            root.right = self.delete(root.right, temp.key)
+
+        if root is None:
+            return root
+
+        root.height = 1 + max(self._height(root.left), self._height(root.right))
+
+        balance = self._height(root.left) - self._height(root.right)
+
+        if balance > 1 and self._height(root.left.left) >= self._height(root.left.right):
+            return self._right_rotate(root)
+
+        if balance > 1 and self._height(root.left.left) < self._height(root.left.right):
+            root.left = self._left_rotate(root.left)
+            return self._right_rotate(root)
+
+        if balance < -1 and self._height(root.right.right) >= self._height(root.right.left):
+            return self._left_rotate(root)
+
+        if balance < -1 and self._height(root.right.right) < self._height(root.right.left):
+            root.right = self._right_rotate(root.right)
+            return self._left_rotate(root)
+
+        return root
+
+
+
+tree = AVLTree()
+for i in range(2, 17):
+    tree.root = tree.insert(tree.root, i)
+tree.delete(tree.root, 5)
+print(tree.root.left.key)
