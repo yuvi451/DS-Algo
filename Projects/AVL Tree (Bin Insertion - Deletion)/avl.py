@@ -1,3 +1,4 @@
+
 from node import Node
 from object import Color
 
@@ -91,28 +92,19 @@ class AVLTree:
             return best_fit_node
 
         bin_capacity = root.key.bin_capacity
-        bin_id = root.key.id
 
         if bin_capacity >= cargo.size:
 
             if best_fit_node is None:
                 best_fit_node = root
 
-            if (color == Color.BLUE and bin_capacity < best_fit_node.key.bin_capacity) or (
-                    color == Color.YELLOW and bin_capacity < best_fit_node.key.bin_capacity) or (
-                    color == Color.RED and bin_capacity > best_fit_node.key.bin_capacity) or (
-                    color == Color.GREEN and bin_capacity > best_fit_node.key.bin_capacity):
+            if color == Color.BLUE or color == Color.YELLOW:
                 best_fit_node = root
+                return self.Cargo(root.left, cargo, color, best_fit_node)
 
-            elif bin_capacity == best_fit_node.key.bin_capacity:
-                if (color == Color.BLUE and bin_id < best_fit_node.key.id) or (
-                        color == Color.YELLOW and bin_id > best_fit_node.key.id) or (
-                        color == Color.RED and bin_id < best_fit_node.key.id) or (
-                        color == Color.GREEN and bin_id > best_fit_node.key.id):
-                    best_fit_node = root
-
-            best_fit_node = self.Cargo(root.left, cargo, color, best_fit_node)
-            return self.Cargo(root.right, cargo, color, best_fit_node)
+            if color == Color.GREEN or color == color.RED:
+                best_fit_node = root
+                return self.Cargo(root.right, cargo, color, best_fit_node)
 
         else:
             return self.Cargo(root.right, cargo, color, best_fit_node)
@@ -235,5 +227,3 @@ class AVLTree:
                 return self._rotate_left(root)
 
         return root
-
-
