@@ -42,11 +42,11 @@ class ParserTreasure(Parser):
                 except:
                     print(f"Cannot add treasure {id} to treasury")
             elif query_type == 'Get':
-                # try:
+                try:
                 processed = treasury.get_completion_time()
                 print('Completion Time:', [(treasure_obj.id, treasure_obj.completion_time) for treasure_obj in processed])
-                # except:
-                #     print('Cannot get completion time')
+                except:
+                    print('Cannot get completion time')
             else:
                 raise ValueError('Invalid Input')
 
