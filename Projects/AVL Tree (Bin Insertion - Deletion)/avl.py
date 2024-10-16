@@ -1,4 +1,3 @@
-
 from node import Node
 from object import Color
 
