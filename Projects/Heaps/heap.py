@@ -64,9 +64,9 @@ class Heap:
         right = 2 * i + 2
         while (left < len(self.heap) and get_load(self.heap[left], t) < get_load(self.heap[i], t)) or (
                 right < len(self.heap) and get_load(self.heap[right], t) < get_load(self.heap[i], t)):
-            t = left if (right >= len(self.heap) or get_load(self.heap[left], t) < get_load(self.heap[right], t)) else right
-            self.heap[i], self.heap[t] = self.heap[t], self.heap[i]
-            i = t
+            p = left if (right >= len(self.heap) or get_load(self.heap[left], t) < get_load(self.heap[right], t)) else right
+            self.heap[i], self.heap[p] = self.heap[p], self.heap[i]
+            i = p
             left = 2 * i + 1
             right = 2 * i + 2
         return val
