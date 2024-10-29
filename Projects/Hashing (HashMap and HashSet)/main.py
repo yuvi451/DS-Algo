@@ -1,3 +1,5 @@
+# sort your search_keyword() and distinct_words() list before running this tc
+
 import time
 
 import library
