@@ -14,7 +14,7 @@ void BFS(vvl adj, vl& ans, int root){
         fora(x, adj[node]){
             if (!(visited[x])){
                 visited[x] = 1;
-                distance[x] = distance[node] + 1;
+                distance[x] = 1 + distance[node];
                 q.push(x);
                 ans.pb(x);
             }
