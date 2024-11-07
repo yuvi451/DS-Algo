@@ -1,5 +1,5 @@
-void Dijkstra(vvl edges, int nodes, int start, vl& distance){
-    distance[start] = 0;
+void Dijkstra(vvl edges, int nodes, int root, vl& distance){
+    distance[root] = 0;
     vector <vpr> adj(nodes + 1);
     fora(x, edges){
         adj[x[0]].pb({x[1], x[2]});
@@ -8,9 +8,9 @@ void Dijkstra(vvl edges, int nodes, int start, vl& distance){
     vl processed(nodes + 1);
 
     priority_queue <pr> pq;
-    pq.push({0, start});
+    pq.push({0, root});
 
-    while (pq.size() != 0){
+    while (!pq.empty(){
         int node = pq.top().second;
         pq.pop();
 
