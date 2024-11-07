@@ -1,19 +1,20 @@
-void BFS(vvl adj, vl& ans, int start){
+void BFS(vvl adj, vl& ans, int root){
     int n = adj.size();
-    vl visited(n + 1);
+    vl visited(n + 1), distance(n + 1);
 
     queue <int> q;
-    q.push(start);
-    visited[start] = 1;
-    ans.pb(start);
+    q.push(root);
+    visited[root] = 1;
+    ans.pb(root);
 
-    while (q.size() != 0){
+    while (!q.empty(){
         int node = q.front();
         q.pop();
 
         fora(x, adj[node]){
             if (!(visited[x])){
                 visited[x] = 1;
+                distance[x] = distance[node] + 1;
                 q.push(x);
                 ans.pb(x);
             }
