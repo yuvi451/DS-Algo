@@ -2,10 +2,9 @@ void DFS(vvl& adj, vl& visited, int root, vl& ans){
     if (!(visited[root])){
         visited[root] = 1;
         ans.pb(root);
-    }
-
-    fora(x, adj[root]){
-        DFS(adj, visited, x, ans);
+        fora(x, adj[root]){
+            DFS(adj, visited, x, ans);
+        }
     }
 }
 
