@@ -1,15 +1,11 @@
-void DFS(vvl& adj, vl& visited, int start, vl& ans){
-    if (!(visited[start])){
-        visited[start] = 1;
-        ans.pb(start);
+void DFS(vvl& adj, vl& visited, int root, vl& ans){
+    if (!(visited[root])){
+        visited[root] = 1;
+        ans.pb(root);
     }
 
-    fora(x, adj[start]){
-        if (!(visited[x])){
-            visited[x] = 1;
-            ans.pb(x);
-            DFS(adj, visited, x, ans);
-        }
+    fora(x, adj[root]){
+        DFS(adj, visited, x, ans);
     }
 }
 
