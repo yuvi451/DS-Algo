@@ -1,0 +1,5000 @@
+Test Case 1:
+Route 1: 6, 288
+Route 2: 60
+Route 3: 6, 60
+
+Test Case 2:
+Route 1: 9, 780
+Route 2: 107
+Route 3: 9, 107
+
+Test Case 3:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 4:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 5:
+Route 1: 5, 575
+Route 2: 138
+Route 3: 5, 138
+
+Test Case 6:
+Route 1: 4, 726
+Route 2: 71
+Route 3: 4, 71
+
+Test Case 7:
+Route 1: 6, 709
+Route 2: 128
+Route 3: 6, 128
+
+Test Case 8:
+Route 1: 5, 247
+Route 2: 50
+Route 3: 5, 50
+
+Test Case 9:
+Route 1: 3, 165
+Route 2: 30
+Route 3: 3, 30
+
+Test Case 10:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 11:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 12:
+Route 1: 1, 376
+Route 2: 57
+Route 3: 1, 98
+
+Test Case 13:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 14:
+Route 1: 4, 657
+Route 2: 105
+Route 3: 4, 105
+
+Test Case 15:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 16:
+Route 1: 3, 450
+Route 2: 50
+Route 3: 3, 136
+
+Test Case 17:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 18:
+Route 1: 3, 848
+Route 2: 49
+Route 3: 3, 49
+
+Test Case 19:
+Route 1: 5, 698
+Route 2: 106
+Route 3: 5, 106
+
+Test Case 20:
+Route 1: 1, 201
+Route 2: 36
+Route 3: 1, 36
+
+Test Case 21:
+Route 1: 4, 329
+Route 2: 70
+Route 3: 4, 130
+
+Test Case 22:
+Route 1: 3, 768
+Route 2: 48
+Route 3: 3, 96
+
+Test Case 23:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 24:
+Route 1: 2, 659
+Route 2: 113
+Route 3: 2, 113
+
+Test Case 25:
+Route 1: 2, 389
+Route 2: 126
+Route 3: 2, 126
+
+Test Case 26:
+Route 1: 2, 307
+Route 2: 80
+Route 3: 2, 80
+
+Test Case 27:
+Route 1: 3, 873
+Route 2: 39
+Route 3: 3, 132
+
+Test Case 28:
+Route 1: 3, 484
+Route 2: 27
+Route 3: 3, 27
+
+Test Case 29:
+Route 1: 1, 164
+Route 2: 57
+Route 3: 1, 57
+
+Test Case 30:
+Route 1: 1, 364
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 31:
+Route 1: 4, 1014
+Route 2: 101
+Route 3: 4, 173
+
+Test Case 32:
+Route 1: 1, 169
+Route 2: 25
+Route 3: 1, 42
+
+Test Case 33:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 34:
+Route 1: 1, 174
+Route 2: 51
+Route 3: 1, 84
+
+Test Case 35:
+Route 1: 1, 590
+Route 2: 37
+Route 3: 1, 37
+
+Test Case 36:
+Route 1: 1, 226
+Route 2: 38
+Route 3: 1, 38
+
+Test Case 37:
+Route 1: 2, 928
+Route 2: 50
+Route 3: 2, 76
+
+Test Case 38:
+Route 1: 2, 653
+Route 2: 40
+Route 3: 2, 99
+
+Test Case 39:
+Route 1: 2, 366
+Route 2: 75
+Route 3: 2, 87
+
+Test Case 40:
+Route 1: 2, 548
+Route 2: 90
+Route 3: 2, 90
+
+Test Case 41:
+Route 1: 1, 202
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 42:
+Route 1: 1, 768
+Route 2: 21
+Route 3: 1, 21
+
+Test Case 43:
+Route 1: 2, 739
+Route 2: 45
+Route 3: 2, 45
+
+Test Case 44:
+Route 1: 2, 351
+Route 2: 55
+Route 3: 2, 102
+
+Test Case 45:
+Route 1: 3, 762
+Route 2: 134
+Route 3: 3, 161
+
+Test Case 46:
+Route 1: 1, 980
+Route 2: 51
+Route 3: 1, 82
+
+Test Case 47:
+Route 1: 1, 540
+Route 2: 54
+Route 3: 1, 81
+
+Test Case 48:
+Route 1: 1, 171
+Route 2: 22
+Route 3: 1, 22
+
+Test Case 49:
+Route 1: 2, 516
+Route 2: 39
+Route 3: 2, 39
+
+Test Case 50:
+Route 1: 1, 747
+Route 2: 40
+Route 3: 1, 73
+
+Test Case 51:
+Route 1: 1, 542
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 52:
+Route 1: 1, 307
+Route 2: 33
+Route 3: 1, 33
+
+Test Case 53:
+Route 1: 1, 36
+Route 2: 19
+Route 3: 1, 19
+
+Test Case 54:
+Route 1: 2, 579
+Route 2: 23
+Route 3: 2, 23
+
+Test Case 55:
+Route 1: 1, 697
+Route 2: 28
+Route 3: 1, 77
+
+Test Case 56:
+Route 1: 2, 238
+Route 2: 39
+Route 3: 2, 49
+
+Test Case 57:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 58:
+Route 1: 2, 425
+Route 2: 34
+Route 3: 2, 34
+
+Test Case 59:
+Route 1: 2, 442
+Route 2: 24
+Route 3: 2, 24
+
+Test Case 60:
+Route 1: 2, 810
+Route 2: 30
+Route 3: 2, 120
+
+Test Case 61:
+Route 1: 2, 740
+Route 2: 64
+Route 3: 2, 81
+
+Test Case 62:
+Route 1: 1, 611
+Route 2: 33
+Route 3: 1, 83
+
+Test Case 63:
+Route 1: 1, 530
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 64:
+Route 1: 1, 279
+Route 2: 27
+Route 3: 1, 27
+
+Test Case 65:
+Route 1: 1, 558
+Route 2: 26
+Route 3: 1, 50
+
+Test Case 66:
+Route 1: 2, 758
+Route 2: 40
+Route 3: 2, 50
+
+Test Case 67:
+Route 1: 2, 443
+Route 2: 33
+Route 3: 2, 42
+
+Test Case 68:
+Route 1: 2, 293
+Route 2: 27
+Route 3: 2, 76
+
+Test Case 69:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 70:
+Route 1: 2, 599
+Route 2: 54
+Route 3: 2, 68
+
+Test Case 71:
+Route 1: 2, 168
+Route 2: 35
+Route 3: 2, 35
+
+Test Case 72:
+Route 1: 1, 462
+Route 2: 23
+Route 3: 1, 87
+
+Test Case 73:
+Route 1: 1, 498
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 74:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 75:
+Route 1: 1, 480
+Route 2: 15
+Route 3: 1, 87
+
+Test Case 76:
+Route 1: 2, 780
+Route 2: 15
+Route 3: 2, 15
+
+Test Case 77:
+Route 1: 1, 205
+Route 2: 29
+Route 3: 1, 73
+
+Test Case 78:
+Route 1: 1, 943
+Route 2: 44
+Route 3: 1, 44
+
+Test Case 79:
+Route 1: 1, 304
+Route 2: 27
+Route 3: 1, 27
+
+Test Case 80:
+Route 1: 2, 247
+Route 2: 29
+Route 3: 2, 29
+
+Test Case 81:
+Route 1: 2, 197
+Route 2: 39
+Route 3: 2, 68
+
+Test Case 82:
+Route 1: 1, 159
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 83:
+Route 1: 1, 998
+Route 2: 12
+Route 3: 1, 39
+
+Test Case 84:
+Route 1: 1, 78
+Route 2: 26
+Route 3: 1, 26
+
+Test Case 85:
+Route 1: 1, 195
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 86:
+Route 1: 1, 188
+Route 2: 32
+Route 3: 1, 91
+
+Test Case 87:
+Route 1: 1, 320
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 88:
+Route 1: 1, 921
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 89:
+Route 1: 2, 124
+Route 2: 20
+Route 3: 2, 20
+
+Test Case 90:
+Route 1: 1, 319
+Route 2: 22
+Route 3: 1, 22
+
+Test Case 91:
+Route 1: 2, 429
+Route 2: 45
+Route 3: 2, 71
+
+Test Case 92:
+Route 1: 1, 357
+Route 2: 34
+Route 3: 1, 86
+
+Test Case 93:
+Route 1: 1, 527
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 94:
+Route 1: 1, 338
+Route 2: 31
+Route 3: 1, 31
+
+Test Case 95:
+Route 1: 1, 825
+Route 2: 29
+Route 3: 1, 96
+
+Test Case 96:
+Route 1: 1, 488
+Route 2: 27
+Route 3: 1, 27
+
+Test Case 97:
+Route 1: 1, 540
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 98:
+Route 1: 1, 549
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 99:
+Route 1: 1, 98
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 100:
+Route 1: 2, 309
+Route 2: 42
+Route 3: 2, 42
+
+Test Case 101:
+Route 1: 2, 363
+Route 2: 30
+Route 3: 2, 37
+
+Test Case 102:
+Route 1: 1, 990
+Route 2: 46
+Route 3: 1, 53
+
+Test Case 103:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 104:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 105:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 106:
+Route 1: 1, 547
+Route 2: 22
+Route 3: 1, 22
+
+Test Case 107:
+Route 1: 1, 157
+Route 2: 38
+Route 3: 1, 41
+
+Test Case 108:
+Route 1: 1, 252
+Route 2: 26
+Route 3: 1, 66
+
+Test Case 109:
+Route 1: 1, 519
+Route 2: 46
+Route 3: 1, 74
+
+Test Case 110:
+Route 1: 1, 1064
+Route 2: 45
+Route 3: 1, 91
+
+Test Case 111:
+Route 1: 2, 649
+Route 2: 23
+Route 3: 2, 53
+
+Test Case 112:
+Route 1: 1, 192
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 113:
+Route 1: 1, 651
+Route 2: 25
+Route 3: 1, 89
+
+Test Case 114:
+Route 1: 1, 147
+Route 2: 32
+Route 3: 1, 73
+
+Test Case 115:
+Route 1: 1, 132
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 116:
+Route 1: 2, 430
+Route 2: 19
+Route 3: 2, 19
+
+Test Case 117:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 118:
+Route 1: 1, 435
+Route 2: 34
+Route 3: 1, 46
+
+Test Case 119:
+Route 1: 1, 686
+Route 2: 51
+Route 3: 1, 76
+
+Test Case 120:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 121:
+Route 1: 2, 78
+Route 2: 20
+Route 3: 2, 20
+
+Test Case 122:
+Route 1: 1, 552
+Route 2: 23
+Route 3: 1, 23
+
+Test Case 123:
+Route 1: 1, 816
+Route 2: 14
+Route 3: 1, 71
+
+Test Case 124:
+Route 1: 1, 696
+Route 2: 28
+Route 3: 1, 38
+
+Test Case 125:
+Route 1: 1, 999
+Route 2: 18
+Route 3: 1, 18
+
+Test Case 126:
+Route 1: 2, 474
+Route 2: 48
+Route 3: 2, 48
+
+Test Case 127:
+Route 1: 2, 460
+Route 2: 22
+Route 3: 2, 22
+
+Test Case 128:
+Route 1: 1, 186
+Route 2: 13
+Route 3: 1, 38
+
+Test Case 129:
+Route 1: 2, 543
+Route 2: 35
+Route 3: 2, 43
+
+Test Case 130:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 131:
+Route 1: 2, 534
+Route 2: 25
+Route 3: 2, 25
+
+Test Case 132:
+Route 1: 1, 730
+Route 2: 15
+Route 3: 1, 96
+
+Test Case 133:
+Route 1: 1, 208
+Route 2: 29
+Route 3: 1, 49
+
+Test Case 134:
+Route 1: 1, 735
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 135:
+Route 1: 1, 279
+Route 2: 35
+Route 3: 1, 45
+
+Test Case 136:
+Route 1: 1, 221
+Route 2: 46
+Route 3: 1, 91
+
+Test Case 137:
+Route 1: 2, 284
+Route 2: 26
+Route 3: 2, 26
+
+Test Case 138:
+Route 1: 1, 62
+Route 2: 25
+Route 3: 1, 33
+
+Test Case 139:
+Route 1: 2, 343
+Route 2: 25
+Route 3: 2, 48
+
+Test Case 140:
+Route 1: 1, 283
+Route 2: 16
+Route 3: 1, 30
+
+Test Case 141:
+Route 1: 1, 127
+Route 2: 33
+Route 3: 1, 46
+
+Test Case 142:
+Route 1: 1, 709
+Route 2: 26
+Route 3: 1, 26
+
+Test Case 143:
+Route 1: 1, 86
+Route 2: 34
+Route 3: 1, 38
+
+Test Case 144:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 145:
+Route 1: 1, 932
+Route 2: 27
+Route 3: 1, 33
+
+Test Case 146:
+Route 1: 1, 949
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 147:
+Route 1: 1, 223
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 148:
+Route 1: 2, 232
+Route 2: 29
+Route 3: 2, 30
+
+Test Case 149:
+Route 1: 1, 639
+Route 2: 31
+Route 3: 1, 31
+
+Test Case 150:
+Route 1: 1, 492
+Route 2: 19
+Route 3: 1, 52
+
+Test Case 151:
+Route 1: 1, 269
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 152:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 153:
+Route 1: 1, 342
+Route 2: 19
+Route 3: 1, 26
+
+Test Case 154:
+Route 1: 1, 177
+Route 2: 18
+Route 3: 1, 18
+
+Test Case 155:
+Route 1: 1, 960
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 156:
+Route 1: 1, 166
+Route 2: 26
+Route 3: 1, 56
+
+Test Case 157:
+Route 1: 1, 241
+Route 2: 27
+Route 3: 1, 30
+
+Test Case 158:
+Route 1: 1, 47
+Route 2: 20
+Route 3: 1, 20
+
+Test Case 159:
+Route 1: 1, 500
+Route 2: 29
+Route 3: 1, 70
+
+Test Case 160:
+Route 1: 1, 385
+Route 2: 48
+Route 3: 1, 66
+
+Test Case 161:
+Route 1: 1, 638
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 162:
+Route 1: 1, 378
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 163:
+Route 1: 1, 426
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 164:
+Route 1: 1, 213
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 165:
+Route 1: 1, 264
+Route 2: 25
+Route 3: 1, 58
+
+Test Case 166:
+Route 1: 1, 463
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 167:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 168:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 169:
+Route 1: 1, 217
+Route 2: 29
+Route 3: 1, 38
+
+Test Case 170:
+Route 1: 1, 509
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 171:
+Route 1: 1, 432
+Route 2: 18
+Route 3: 1, 42
+
+Test Case 172:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 173:
+Route 1: 2, 201
+Route 2: 29
+Route 3: 2, 30
+
+Test Case 174:
+Route 1: 1, 508
+Route 2: 23
+Route 3: 1, 96
+
+Test Case 175:
+Route 1: 1, 812
+Route 2: 22
+Route 3: 1, 51
+
+Test Case 176:
+Route 1: 1, 276
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 177:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 178:
+Route 1: 1, 378
+Route 2: 30
+Route 3: 1, 92
+
+Test Case 179:
+Route 1: 1, 294
+Route 2: 36
+Route 3: 1, 56
+
+Test Case 180:
+Route 1: 1, 175
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 181:
+Route 1: 1, 295
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 182:
+Route 1: 1, 438
+Route 2: 27
+Route 3: 1, 51
+
+Test Case 183:
+Route 1: 1, 538
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 184:
+Route 1: 1, 201
+Route 2: 20
+Route 3: 1, 79
+
+Test Case 185:
+Route 1: 1, 119
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 186:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 187:
+Route 1: 1, 359
+Route 2: 22
+Route 3: 1, 59
+
+Test Case 188:
+Route 1: 2, 311
+Route 2: 24
+Route 3: 2, 24
+
+Test Case 189:
+Route 1: 1, 607
+Route 2: 17
+Route 3: 1, 68
+
+Test Case 190:
+Route 1: 1, 604
+Route 2: 21
+Route 3: 1, 21
+
+Test Case 191:
+Route 1: 1, 970
+Route 2: 28
+Route 3: 1, 34
+
+Test Case 192:
+Route 1: 1, 349
+Route 2: 32
+Route 3: 1, 39
+
+Test Case 193:
+Route 1: 1, 807
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 194:
+Route 1: 1, 980
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 195:
+Route 1: 1, 124
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 196:
+Route 1: 1, 261
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 197:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 198:
+Route 1: 1, 213
+Route 2: 21
+Route 3: 1, 21
+
+Test Case 199:
+Route 1: 1, 43
+Route 2: 19
+Route 3: 1, 47
+
+Test Case 200:
+Route 1: 1, 273
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 201:
+Route 1: 1, 78
+Route 2: 15
+Route 3: 1, 59
+
+Test Case 202:
+Route 1: 1, 378
+Route 2: 30
+Route 3: 1, 37
+
+Test Case 203:
+Route 1: 1, 668
+Route 2: 12
+Route 3: 1, 24
+
+Test Case 204:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 205:
+Route 1: 1, 119
+Route 2: 33
+Route 3: 1, 46
+
+Test Case 206:
+Route 1: 1, 875
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 207:
+Route 1: 1, 588
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 208:
+Route 1: 1, 519
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 209:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 210:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 211:
+Route 1: 1, 259
+Route 2: 16
+Route 3: 1, 28
+
+Test Case 212:
+Route 1: 1, 477
+Route 2: 28
+Route 3: 1, 39
+
+Test Case 213:
+Route 1: 1, 198
+Route 2: 24
+Route 3: 1, 36
+
+Test Case 214:
+Route 1: 1, 724
+Route 2: 17
+Route 3: 1, 20
+
+Test Case 215:
+Route 1: 1, 384
+Route 2: 15
+Route 3: 1, 77
+
+Test Case 216:
+Route 1: 1, 253
+Route 2: 19
+Route 3: 1, 38
+
+Test Case 217:
+Route 1: 1, 133
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 218:
+Route 1: 1, 296
+Route 2: 16
+Route 3: 1, 66
+
+Test Case 219:
+Route 1: 1, 608
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 220:
+Route 1: 1, 733
+Route 2: 35
+Route 3: 1, 88
+
+Test Case 221:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 222:
+Route 1: 2, 310
+Route 2: 13
+Route 3: 2, 13
+
+Test Case 223:
+Route 1: 1, 584
+Route 2: 23
+Route 3: 1, 72
+
+Test Case 224:
+Route 1: 2, 428
+Route 2: 22
+Route 3: 2, 32
+
+Test Case 225:
+Route 1: 1, 429
+Route 2: 10
+Route 3: 1, 100
+
+Test Case 226:
+Route 1: 1, 332
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 227:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 228:
+Route 1: 1, 945
+Route 2: 28
+Route 3: 1, 88
+
+Test Case 229:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 230:
+Route 1: 1, 197
+Route 2: 16
+Route 3: 1, 23
+
+Test Case 231:
+Route 1: 1, 400
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 232:
+Route 1: 2, 288
+Route 2: 24
+Route 3: 2, 32
+
+Test Case 233:
+Route 1: 1, 152
+Route 2: 14
+Route 3: 1, 21
+
+Test Case 234:
+Route 1: 1, 528
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 235:
+Route 1: 1, 604
+Route 2: 11
+Route 3: 1, 21
+
+Test Case 236:
+Route 1: 1, 824
+Route 2: 22
+Route 3: 1, 35
+
+Test Case 237:
+Route 1: 1, 652
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 238:
+Route 1: 1, 177
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 239:
+Route 1: 1, 247
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 240:
+Route 1: 1, 561
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 241:
+Route 1: 1, 248
+Route 2: 22
+Route 3: 1, 22
+
+Test Case 242:
+Route 1: 1, 783
+Route 2: 13
+Route 3: 1, 65
+
+Test Case 243:
+Route 1: 1, 444
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 244:
+Route 1: 1, 140
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 245:
+Route 1: 1, 968
+Route 2: 26
+Route 3: 1, 71
+
+Test Case 246:
+Route 1: 1, 521
+Route 2: 23
+Route 3: 1, 23
+
+Test Case 247:
+Route 1: 1, 245
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 248:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 249:
+Route 1: 2, 273
+Route 2: 18
+Route 3: 2, 18
+
+Test Case 250:
+Route 1: 1, 90
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 251:
+Route 1: 1, 211
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 252:
+Route 1: 1, 381
+Route 2: 16
+Route 3: 1, 52
+
+Test Case 253:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 254:
+Route 1: 1, 695
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 255:
+Route 1: 1, 252
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 256:
+Route 1: 2, 198
+Route 2: 22
+Route 3: 2, 22
+
+Test Case 257:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 258:
+Route 1: 1, 137
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 259:
+Route 1: 1, 201
+Route 2: 24
+Route 3: 1, 26
+
+Test Case 260:
+Route 1: 1, 176
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 261:
+Route 1: 1, 674
+Route 2: 20
+Route 3: 1, 87
+
+Test Case 262:
+Route 1: 1, 408
+Route 2: 10
+Route 3: 1, 71
+
+Test Case 263:
+Route 1: 1, 764
+Route 2: 12
+Route 3: 1, 54
+
+Test Case 264:
+Route 1: 1, 184
+Route 2: 25
+Route 3: 1, 25
+
+Test Case 265:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 266:
+Route 1: 1, 192
+Route 2: 20
+Route 3: 1, 20
+
+Test Case 267:
+Route 1: 1, 273
+Route 2: 27
+Route 3: 1, 29
+
+Test Case 268:
+Route 1: 1, 525
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 269:
+Route 1: 1, 458
+Route 2: 20
+Route 3: 1, 22
+
+Test Case 270:
+Route 1: 1, 241
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 271:
+Route 1: 1, 579
+Route 2: 28
+Route 3: 1, 62
+
+Test Case 272:
+Route 1: 1, 401
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 273:
+Route 1: 1, 56
+Route 2: 27
+Route 3: 1, 38
+
+Test Case 274:
+Route 1: 1, 189
+Route 2: 15
+Route 3: 1, 26
+
+Test Case 275:
+Route 1: 1, 488
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 276:
+Route 1: 1, 183
+Route 2: 28
+Route 3: 1, 48
+
+Test Case 277:
+Route 1: 1, 955
+Route 2: 21
+Route 3: 1, 45
+
+Test Case 278:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 279:
+Route 1: 1, 66
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 280:
+Route 1: 1, 155
+Route 2: 17
+Route 3: 1, 20
+
+Test Case 281:
+Route 1: 1, 928
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 282:
+Route 1: 1, 434
+Route 2: 23
+Route 3: 1, 23
+
+Test Case 283:
+Route 1: 1, 105
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 284:
+Route 1: 1, 919
+Route 2: 19
+Route 3: 1, 94
+
+Test Case 285:
+Route 1: 1, 167
+Route 2: 24
+Route 3: 1, 24
+
+Test Case 286:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 287:
+Route 1: 1, 502
+Route 2: 19
+Route 3: 1, 52
+
+Test Case 288:
+Route 1: 1, 219
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 289:
+Route 1: 1, 916
+Route 2: 22
+Route 3: 1, 78
+
+Test Case 290:
+Route 1: 1, 289
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 291:
+Route 1: 1, 160
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 292:
+Route 1: 1, 1025
+Route 2: 26
+Route 3: 1, 76
+
+Test Case 293:
+Route 1: 1, 443
+Route 2: 14
+Route 3: 1, 100
+
+Test Case 294:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 295:
+Route 1: 1, 131
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 296:
+Route 1: 1, 423
+Route 2: 27
+Route 3: 1, 52
+
+Test Case 297:
+Route 1: 1, 241
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 298:
+Route 1: 1, 735
+Route 2: 20
+Route 3: 1, 67
+
+Test Case 299:
+Route 1: 1, 172
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 300:
+Route 1: 1, 240
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 301:
+Route 1: 1, 215
+Route 2: 20
+Route 3: 1, 67
+
+Test Case 302:
+Route 1: 1, 248
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 303:
+Route 1: 1, 168
+Route 2: 13
+Route 3: 1, 17
+
+Test Case 304:
+Route 1: 1, 197
+Route 2: 11
+Route 3: 1, 21
+
+Test Case 305:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 306:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 307:
+Route 1: 1, 153
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 308:
+Route 1: 1, 598
+Route 2: 17
+Route 3: 1, 26
+
+Test Case 309:
+Route 1: 1, 221
+Route 2: 15
+Route 3: 1, 33
+
+Test Case 310:
+Route 1: 1, 157
+Route 2: 15
+Route 3: 1, 68
+
+Test Case 311:
+Route 1: 1, 103
+Route 2: 22
+Route 3: 1, 35
+
+Test Case 312:
+Route 1: 1, 384
+Route 2: 17
+Route 3: 1, 70
+
+Test Case 313:
+Route 1: 1, 894
+Route 2: 29
+Route 3: 1, 77
+
+Test Case 314:
+Route 1: 1, 112
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 315:
+Route 1: 1, 121
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 316:
+Route 1: 1, 596
+Route 2: 11
+Route 3: 1, 56
+
+Test Case 317:
+Route 1: 1, 142
+Route 2: 15
+Route 3: 1, 18
+
+Test Case 318:
+Route 1: 1, 261
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 319:
+Route 1: 1, 60
+Route 2: 21
+Route 3: 1, 69
+
+Test Case 320:
+Route 1: 1, 298
+Route 2: 15
+Route 3: 1, 54
+
+Test Case 321:
+Route 1: 1, 331
+Route 2: 10
+Route 3: 1, 32
+
+Test Case 322:
+Route 1: 1, 153
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 323:
+Route 1: 1, 375
+Route 2: 23
+Route 3: 1, 23
+
+Test Case 324:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 325:
+Route 1: 1, 1022
+Route 2: 23
+Route 3: 1, 72
+
+Test Case 326:
+Route 1: 1, 139
+Route 2: 21
+Route 3: 1, 31
+
+Test Case 327:
+Route 1: 1, 385
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 328:
+Route 1: 1, 1031
+Route 2: 24
+Route 3: 1, 41
+
+Test Case 329:
+Route 1: 1, 52
+Route 2: 22
+Route 3: 1, 35
+
+Test Case 330:
+Route 1: 1, 181
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 331:
+Route 1: 1, 136
+Route 2: 19
+Route 3: 1, 19
+
+Test Case 332:
+Route 1: 1, 433
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 333:
+Route 1: 1, 362
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 334:
+Route 1: 1, 219
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 335:
+Route 1: 1, 208
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 336:
+Route 1: 1, 513
+Route 2: 21
+Route 3: 1, 23
+
+Test Case 337:
+Route 1: 1, 158
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 338:
+Route 1: 1, 128
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 339:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 340:
+Route 1: 1, 309
+Route 2: 12
+Route 3: 1, 26
+
+Test Case 341:
+Route 1: 1, 150
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 342:
+Route 1: 1, 615
+Route 2: 20
+Route 3: 1, 42
+
+Test Case 343:
+Route 1: 1, 161
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 344:
+Route 1: 1, 296
+Route 2: 21
+Route 3: 1, 35
+
+Test Case 345:
+Route 1: 1, 257
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 346:
+Route 1: 1, 99
+Route 2: 17
+Route 3: 1, 24
+
+Test Case 347:
+Route 1: 1, 363
+Route 2: 14
+Route 3: 1, 18
+
+Test Case 348:
+Route 1: 1, 94
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 349:
+Route 1: 1, 410
+Route 2: 14
+Route 3: 1, 32
+
+Test Case 350:
+Route 1: 1, 138
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 351:
+Route 1: 1, 592
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 352:
+Route 1: 1, 245
+Route 2: 21
+Route 3: 1, 37
+
+Test Case 353:
+Route 1: 1, 97
+Route 2: 16
+Route 3: 1, 26
+
+Test Case 354:
+Route 1: 1, 261
+Route 2: 18
+Route 3: 1, 35
+
+Test Case 355:
+Route 1: 1, 200
+Route 2: 20
+Route 3: 1, 69
+
+Test Case 356:
+Route 1: 1, 445
+Route 2: 17
+Route 3: 1, 24
+
+Test Case 357:
+Route 1: 1, 228
+Route 2: 12
+Route 3: 1, 34
+
+Test Case 358:
+Route 1: 1, 383
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 359:
+Route 1: 1, 261
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 360:
+Route 1: 1, 448
+Route 2: 21
+Route 3: 1, 72
+
+Test Case 361:
+Route 1: 1, 266
+Route 2: 28
+Route 3: 1, 28
+
+Test Case 362:
+Route 1: 1, 495
+Route 2: 26
+Route 3: 1, 36
+
+Test Case 363:
+Route 1: 1, 668
+Route 2: 20
+Route 3: 1, 23
+
+Test Case 364:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 365:
+Route 1: 1, 211
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 366:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 367:
+Route 1: 1, 177
+Route 2: 14
+Route 3: 1, 29
+
+Test Case 368:
+Route 1: 1, 344
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 369:
+Route 1: 1, 378
+Route 2: 14
+Route 3: 1, 61
+
+Test Case 370:
+Route 1: 1, 360
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 371:
+Route 1: 1, 164
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 372:
+Route 1: 1, 90
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 373:
+Route 1: 1, 339
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 374:
+Route 1: 1, 277
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 375:
+Route 1: 1, 177
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 376:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 377:
+Route 1: 1, 206
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 378:
+Route 1: 1, 132
+Route 2: 19
+Route 3: 1, 86
+
+Test Case 379:
+Route 1: 1, 894
+Route 2: 10
+Route 3: 1, 22
+
+Test Case 380:
+Route 1: 1, 255
+Route 2: 22
+Route 3: 1, 22
+
+Test Case 381:
+Route 1: 1, 206
+Route 2: 23
+Route 3: 1, 38
+
+Test Case 382:
+Route 1: 1, 164
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 383:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 384:
+Route 1: 1, 513
+Route 2: 20
+Route 3: 1, 53
+
+Test Case 385:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 386:
+Route 1: 1, 468
+Route 2: 15
+Route 3: 1, 17
+
+Test Case 387:
+Route 1: 1, 87
+Route 2: 10
+Route 3: 1, 13
+
+Test Case 388:
+Route 1: 1, 292
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 389:
+Route 1: 1, 75
+Route 2: 22
+Route 3: 1, 27
+
+Test Case 390:
+Route 1: 1, 760
+Route 2: 14
+Route 3: 1, 24
+
+Test Case 391:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 392:
+Route 1: 1, 310
+Route 2: 19
+Route 3: 1, 22
+
+Test Case 393:
+Route 1: 1, 127
+Route 2: 15
+Route 3: 1, 46
+
+Test Case 394:
+Route 1: 1, 294
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 395:
+Route 1: 1, 210
+Route 2: 18
+Route 3: 1, 79
+
+Test Case 396:
+Route 1: 1, 157
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 397:
+Route 1: 1, 212
+Route 2: 20
+Route 3: 1, 23
+
+Test Case 398:
+Route 1: 1, 114
+Route 2: 17
+Route 3: 1, 25
+
+Test Case 399:
+Route 1: 1, 224
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 400:
+Route 1: 1, 70
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 401:
+Route 1: 1, 345
+Route 2: 14
+Route 3: 1, 30
+
+Test Case 402:
+Route 1: 1, 494
+Route 2: 16
+Route 3: 1, 19
+
+Test Case 403:
+Route 1: 1, 488
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 404:
+Route 1: 1, 162
+Route 2: 21
+Route 3: 1, 21
+
+Test Case 405:
+Route 1: 1, 20
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 406:
+Route 1: 1, 652
+Route 2: 16
+Route 3: 1, 42
+
+Test Case 407:
+Route 1: 1, 193
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 408:
+Route 1: 1, 94
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 409:
+Route 1: 1, 567
+Route 2: 13
+Route 3: 1, 56
+
+Test Case 410:
+Route 1: 1, 690
+Route 2: 13
+Route 3: 1, 19
+
+Test Case 411:
+Route 1: 1, 597
+Route 2: 20
+Route 3: 1, 31
+
+Test Case 412:
+Route 1: 1, 135
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 413:
+Route 1: 1, 244
+Route 2: 20
+Route 3: 1, 52
+
+Test Case 414:
+Route 1: 1, 132
+Route 2: 18
+Route 3: 1, 36
+
+Test Case 415:
+Route 1: 1, 199
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 416:
+Route 1: 1, 157
+Route 2: 15
+Route 3: 1, 18
+
+Test Case 417:
+Route 1: 1, 221
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 418:
+Route 1: 1, 208
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 419:
+Route 1: 1, 573
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 420:
+Route 1: 1, 224
+Route 2: 20
+Route 3: 1, 29
+
+Test Case 421:
+Route 1: 1, 154
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 422:
+Route 1: 1, 640
+Route 2: 21
+Route 3: 1, 65
+
+Test Case 423:
+Route 1: 1, 252
+Route 2: 18
+Route 3: 1, 18
+
+Test Case 424:
+Route 1: 1, 377
+Route 2: 10
+Route 3: 1, 97
+
+Test Case 425:
+Route 1: 1, 309
+Route 2: 15
+Route 3: 1, 56
+
+Test Case 426:
+Route 1: 1, 184
+Route 2: 19
+Route 3: 1, 44
+
+Test Case 427:
+Route 1: 1, 358
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 428:
+Route 1: 1, 453
+Route 2: 20
+Route 3: 1, 56
+
+Test Case 429:
+Route 1: 1, 262
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 430:
+Route 1: 1, 595
+Route 2: 21
+Route 3: 1, 28
+
+Test Case 431:
+Route 1: 1, 129
+Route 2: 15
+Route 3: 1, 16
+
+Test Case 432:
+Route 1: 1, 806
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 433:
+Route 1: 1, 485
+Route 2: 14
+Route 3: 1, 64
+
+Test Case 434:
+Route 1: 1, 577
+Route 2: 26
+Route 3: 1, 97
+
+Test Case 435:
+Route 1: 1, 69
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 436:
+Route 1: 1, 78
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 437:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 438:
+Route 1: 1, 121
+Route 2: 10
+Route 3: 1, 19
+
+Test Case 439:
+Route 1: 1, 170
+Route 2: 17
+Route 3: 1, 41
+
+Test Case 440:
+Route 1: 1, 480
+Route 2: 18
+Route 3: 1, 23
+
+Test Case 441:
+Route 1: 1, 365
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 442:
+Route 1: 1, 58
+Route 2: 16
+Route 3: 1, 27
+
+Test Case 443:
+Route 1: 1, 1083
+Route 2: 12
+Route 3: 1, 47
+
+Test Case 444:
+Route 1: 1, 223
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 445:
+Route 1: 1, 53
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 446:
+Route 1: 1, 127
+Route 2: 15
+Route 3: 1, 21
+
+Test Case 447:
+Route 1: 1, 67
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 448:
+Route 1: 1, 254
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 449:
+Route 1: 1, 391
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 450:
+Route 1: 1, 519
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 451:
+Route 1: 1, 146
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 452:
+Route 1: 1, 222
+Route 2: 13
+Route 3: 1, 20
+
+Test Case 453:
+Route 1: 1, 207
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 454:
+Route 1: 1, 123
+Route 2: 14
+Route 3: 1, 38
+
+Test Case 455:
+Route 1: 1, 94
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 456:
+Route 1: 1, 503
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 457:
+Route 1: 1, 298
+Route 2: 20
+Route 3: 1, 94
+
+Test Case 458:
+Route 1: 1, 340
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 459:
+Route 1: 1, 254
+Route 2: 16
+Route 3: 1, 29
+
+Test Case 460:
+Route 1: 1, 273
+Route 2: 17
+Route 3: 1, 63
+
+Test Case 461:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 462:
+Route 1: 1, 366
+Route 2: 17
+Route 3: 1, 34
+
+Test Case 463:
+Route 1: 1, 327
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 464:
+Route 1: 1, 274
+Route 2: 20
+Route 3: 1, 34
+
+Test Case 465:
+Route 1: 1, 144
+Route 2: 14
+Route 3: 1, 19
+
+Test Case 466:
+Route 1: 1, 215
+Route 2: 26
+Route 3: 1, 46
+
+Test Case 467:
+Route 1: 1, 210
+Route 2: 18
+Route 3: 1, 24
+
+Test Case 468:
+Route 1: 1, 206
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 469:
+Route 1: 1, 190
+Route 2: 15
+Route 3: 1, 20
+
+Test Case 470:
+Route 1: 1, 769
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 471:
+Route 1: 1, 715
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 472:
+Route 1: 1, 251
+Route 2: 16
+Route 3: 1, 24
+
+Test Case 473:
+Route 1: 1, 519
+Route 2: 22
+Route 3: 1, 91
+
+Test Case 474:
+Route 1: 1, 186
+Route 2: 19
+Route 3: 1, 19
+
+Test Case 475:
+Route 1: 1, 842
+Route 2: 16
+Route 3: 1, 59
+
+Test Case 476:
+Route 1: 1, 375
+Route 2: 12
+Route 3: 1, 52
+
+Test Case 477:
+Route 1: 1, 149
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 478:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 479:
+Route 1: 1, 88
+Route 2: 16
+Route 3: 1, 17
+
+Test Case 480:
+Route 1: 1, 224
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 481:
+Route 1: 1, 148
+Route 2: 20
+Route 3: 1, 30
+
+Test Case 482:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 483:
+Route 1: 1, 159
+Route 2: 20
+Route 3: 1, 25
+
+Test Case 484:
+Route 1: 1, 176
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 485:
+Route 1: 1, 214
+Route 2: 16
+Route 3: 1, 22
+
+Test Case 486:
+Route 1: 1, 179
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 487:
+Route 1: 1, 19
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 488:
+Route 1: 1, 311
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 489:
+Route 1: 1, 500
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 490:
+Route 1: 1, 323
+Route 2: 21
+Route 3: 1, 71
+
+Test Case 491:
+Route 1: 1, 164
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 492:
+Route 1: 1, 316
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 493:
+Route 1: 1, 135
+Route 2: 21
+Route 3: 1, 54
+
+Test Case 494:
+Route 1: 1, 107
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 495:
+Route 1: 1, 335
+Route 2: 20
+Route 3: 1, 23
+
+Test Case 496:
+Route 1: 1, 165
+Route 2: 25
+Route 3: 1, 28
+
+Test Case 497:
+Route 1: 1, 236
+Route 2: 11
+Route 3: 1, 27
+
+Test Case 498:
+Route 1: 1, 250
+Route 2: 10
+Route 3: 1, 14
+
+Test Case 499:
+Route 1: 1, 235
+Route 2: 12
+Route 3: 1, 43
+
+Test Case 500:
+Route 1: 1, 352
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 501:
+Route 1: 1, 82
+Route 2: 12
+Route 3: 1, 14
+
+Test Case 502:
+Route 1: 1, 485
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 503:
+Route 1: 1, 83
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 504:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 505:
+Route 1: 1, 218
+Route 2: 13
+Route 3: 1, 28
+
+Test Case 506:
+Route 1: 1, 204
+Route 2: 11
+Route 3: 1, 27
+
+Test Case 507:
+Route 1: 1, 229
+Route 2: 20
+Route 3: 1, 52
+
+Test Case 508:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 509:
+Route 1: 1, 567
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 510:
+Route 1: 1, 154
+Route 2: 15
+Route 3: 1, 19
+
+Test Case 511:
+Route 1: 1, 280
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 512:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 513:
+Route 1: 1, 95
+Route 2: 12
+Route 3: 1, 19
+
+Test Case 514:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 515:
+Route 1: 1, 417
+Route 2: 12
+Route 3: 1, 13
+
+Test Case 516:
+Route 1: 1, 374
+Route 2: 15
+Route 3: 1, 16
+
+Test Case 517:
+Route 1: 1, 275
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 518:
+Route 1: 1, 288
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 519:
+Route 1: 1, 527
+Route 2: 20
+Route 3: 1, 62
+
+Test Case 520:
+Route 1: 1, 258
+Route 2: 12
+Route 3: 1, 15
+
+Test Case 521:
+Route 1: 1, 177
+Route 2: 17
+Route 3: 1, 31
+
+Test Case 522:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 523:
+Route 1: 1, 157
+Route 2: 13
+Route 3: 1, 35
+
+Test Case 524:
+Route 1: 1, 406
+Route 2: 10
+Route 3: 1, 20
+
+Test Case 525:
+Route 1: 1, 164
+Route 2: 11
+Route 3: 1, 32
+
+Test Case 526:
+Route 1: 1, 186
+Route 2: 14
+Route 3: 1, 26
+
+Test Case 527:
+Route 1: 1, 204
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 528:
+Route 1: 1, 127
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 529:
+Route 1: 1, 150
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 530:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 531:
+Route 1: 1, 164
+Route 2: 13
+Route 3: 1, 14
+
+Test Case 532:
+Route 1: 1, 252
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 533:
+Route 1: 1, 204
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 534:
+Route 1: 1, 145
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 535:
+Route 1: 1, 299
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 536:
+Route 1: 1, 164
+Route 2: 11
+Route 3: 1, 15
+
+Test Case 537:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 538:
+Route 1: 1, 335
+Route 2: 16
+Route 3: 1, 19
+
+Test Case 539:
+Route 1: 1, 215
+Route 2: 18
+Route 3: 1, 28
+
+Test Case 540:
+Route 1: 1, 220
+Route 2: 20
+Route 3: 1, 34
+
+Test Case 541:
+Route 1: 1, 145
+Route 2: 16
+Route 3: 1, 18
+
+Test Case 542:
+Route 1: 1, 173
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 543:
+Route 1: 1, 85
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 544:
+Route 1: 1, 348
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 545:
+Route 1: 1, 111
+Route 2: 11
+Route 3: 1, 22
+
+Test Case 546:
+Route 1: 1, 114
+Route 2: 15
+Route 3: 1, 35
+
+Test Case 547:
+Route 1: 1, 265
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 548:
+Route 1: 1, 113
+Route 2: 14
+Route 3: 1, 24
+
+Test Case 549:
+Route 1: 1, 106
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 550:
+Route 1: 1, 201
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 551:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 552:
+Route 1: 1, 205
+Route 2: 18
+Route 3: 1, 19
+
+Test Case 553:
+Route 1: 1, 109
+Route 2: 18
+Route 3: 1, 21
+
+Test Case 554:
+Route 1: 1, 80
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 555:
+Route 1: 1, 392
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 556:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 557:
+Route 1: 1, 329
+Route 2: 16
+Route 3: 1, 17
+
+Test Case 558:
+Route 1: 1, 143
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 559:
+Route 1: 1, 228
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 560:
+Route 1: 1, 77
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 561:
+Route 1: 1, 159
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 562:
+Route 1: 1, 220
+Route 2: 17
+Route 3: 1, 21
+
+Test Case 563:
+Route 1: 1, 165
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 564:
+Route 1: 1, 255
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 565:
+Route 1: 1, 190
+Route 2: 18
+Route 3: 1, 18
+
+Test Case 566:
+Route 1: 1, 468
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 567:
+Route 1: 1, 351
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 568:
+Route 1: 1, 244
+Route 2: 16
+Route 3: 1, 17
+
+Test Case 569:
+Route 1: 1, 65
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 570:
+Route 1: 1, 280
+Route 2: 19
+Route 3: 1, 46
+
+Test Case 571:
+Route 1: 1, 287
+Route 2: 10
+Route 3: 1, 27
+
+Test Case 572:
+Route 1: 1, 310
+Route 2: 11
+Route 3: 1, 16
+
+Test Case 573:
+Route 1: 1, 675
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 574:
+Route 1: 1, 131
+Route 2: 15
+Route 3: 1, 26
+
+Test Case 575:
+Route 1: 1, 214
+Route 2: 18
+Route 3: 1, 27
+
+Test Case 576:
+Route 1: 1, 176
+Route 2: 11
+Route 3: 1, 17
+
+Test Case 577:
+Route 1: 1, 606
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 578:
+Route 1: 1, 142
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 579:
+Route 1: 1, 150
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 580:
+Route 1: 1, 318
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 581:
+Route 1: 1, 163
+Route 2: 15
+Route 3: 1, 36
+
+Test Case 582:
+Route 1: 1, 455
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 583:
+Route 1: 1, 159
+Route 2: 14
+Route 3: 1, 16
+
+Test Case 584:
+Route 1: 1, 89
+Route 2: 15
+Route 3: 1, 19
+
+Test Case 585:
+Route 1: 1, 321
+Route 2: 12
+Route 3: 1, 30
+
+Test Case 586:
+Route 1: 1, 255
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 587:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 588:
+Route 1: 1, 279
+Route 2: 20
+Route 3: 1, 36
+
+Test Case 589:
+Route 1: 1, 485
+Route 2: 19
+Route 3: 1, 37
+
+Test Case 590:
+Route 1: 1, 164
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 591:
+Route 1: 1, 155
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 592:
+Route 1: 1, 210
+Route 2: 15
+Route 3: 1, 34
+
+Test Case 593:
+Route 1: 1, 246
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 594:
+Route 1: 1, 50
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 595:
+Route 1: 1, 266
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 596:
+Route 1: 1, 97
+Route 2: 17
+Route 3: 1, 24
+
+Test Case 597:
+Route 1: 1, 190
+Route 2: 17
+Route 3: 1, 22
+
+Test Case 598:
+Route 1: 1, 219
+Route 2: 16
+Route 3: 1, 22
+
+Test Case 599:
+Route 1: 1, 291
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 600:
+Route 1: 1, 256
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 601:
+Route 1: 1, 220
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 602:
+Route 1: 1, 151
+Route 2: 10
+Route 3: 1, 20
+
+Test Case 603:
+Route 1: 1, 113
+Route 2: 12
+Route 3: 1, 23
+
+Test Case 604:
+Route 1: 1, 309
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 605:
+Route 1: 1, 192
+Route 2: 16
+Route 3: 1, 20
+
+Test Case 606:
+Route 1: 1, 190
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 607:
+Route 1: 1, 143
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 608:
+Route 1: 1, 83
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 609:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 610:
+Route 1: 1, 129
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 611:
+Route 1: 1, 129
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 612:
+Route 1: 1, 183
+Route 2: 12
+Route 3: 1, 24
+
+Test Case 613:
+Route 1: 1, 52
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 614:
+Route 1: 1, 161
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 615:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 616:
+Route 1: 1, 165
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 617:
+Route 1: 1, 169
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 618:
+Route 1: 1, 167
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 619:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 620:
+Route 1: 1, 82
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 621:
+Route 1: 1, 333
+Route 2: 17
+Route 3: 1, 21
+
+Test Case 622:
+Route 1: 1, 176
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 623:
+Route 1: 1, 84
+Route 2: 19
+Route 3: 1, 33
+
+Test Case 624:
+Route 1: 1, 148
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 625:
+Route 1: 1, 117
+Route 2: 17
+Route 3: 1, 35
+
+Test Case 626:
+Route 1: 1, 446
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 627:
+Route 1: 1, 80
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 628:
+Route 1: 1, 120
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 629:
+Route 1: 1, 387
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 630:
+Route 1: 1, 332
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 631:
+Route 1: 1, 208
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 632:
+Route 1: 1, 139
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 633:
+Route 1: 1, 126
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 634:
+Route 1: 1, 97
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 635:
+Route 1: 1, 190
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 636:
+Route 1: 1, 304
+Route 2: 16
+Route 3: 1, 20
+
+Test Case 637:
+Route 1: 1, 264
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 638:
+Route 1: 1, 70
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 639:
+Route 1: 1, 261
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 640:
+Route 1: 1, 420
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 641:
+Route 1: 1, 185
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 642:
+Route 1: 1, 191
+Route 2: 15
+Route 3: 1, 37
+
+Test Case 643:
+Route 1: 1, 71
+Route 2: 12
+Route 3: 1, 14
+
+Test Case 644:
+Route 1: 1, 340
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 645:
+Route 1: 1, 197
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 646:
+Route 1: 1, 380
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 647:
+Route 1: 1, 143
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 648:
+Route 1: 1, 215
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 649:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 650:
+Route 1: 1, 111
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 651:
+Route 1: 1, 110
+Route 2: 18
+Route 3: 1, 39
+
+Test Case 652:
+Route 1: 1, 169
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 653:
+Route 1: 1, 201
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 654:
+Route 1: 1, 144
+Route 2: 15
+Route 3: 1, 26
+
+Test Case 655:
+Route 1: 1, 290
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 656:
+Route 1: 1, 27
+Route 2: 17
+Route 3: 1, 22
+
+Test Case 657:
+Route 1: 1, 236
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 658:
+Route 1: 1, 162
+Route 2: 13
+Route 3: 1, 24
+
+Test Case 659:
+Route 1: 1, 185
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 660:
+Route 1: 1, 146
+Route 2: 16
+Route 3: 1, 26
+
+Test Case 661:
+Route 1: 1, 95
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 662:
+Route 1: 1, 182
+Route 2: 12
+Route 3: 1, 14
+
+Test Case 663:
+Route 1: 1, 384
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 664:
+Route 1: 1, 145
+Route 2: 16
+Route 3: 1, 17
+
+Test Case 665:
+Route 1: 1, 91
+Route 2: 13
+Route 3: 1, 28
+
+Test Case 666:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 667:
+Route 1: 1, 297
+Route 2: 13
+Route 3: 1, 26
+
+Test Case 668:
+Route 1: 1, 174
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 669:
+Route 1: 1, 145
+Route 2: 16
+Route 3: 1, 21
+
+Test Case 670:
+Route 1: 1, 56
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 671:
+Route 1: 1, 289
+Route 2: 21
+Route 3: 1, 33
+
+Test Case 672:
+Route 1: 1, 136
+Route 2: 13
+Route 3: 1, 30
+
+Test Case 673:
+Route 1: 1, 208
+Route 2: 13
+Route 3: 1, 26
+
+Test Case 674:
+Route 1: 1, 146
+Route 2: 16
+Route 3: 1, 28
+
+Test Case 675:
+Route 1: 1, 430
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 676:
+Route 1: 1, 53
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 677:
+Route 1: 1, 211
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 678:
+Route 1: 1, 614
+Route 2: 11
+Route 3: 1, 28
+
+Test Case 679:
+Route 1: 1, 227
+Route 2: 15
+Route 3: 1, 17
+
+Test Case 680:
+Route 1: 1, 241
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 681:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 682:
+Route 1: 1, 274
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 683:
+Route 1: 1, 288
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 684:
+Route 1: 1, 118
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 685:
+Route 1: 1, 179
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 686:
+Route 1: 1, 263
+Route 2: 11
+Route 3: 1, 37
+
+Test Case 687:
+Route 1: 1, 406
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 688:
+Route 1: 1, 731
+Route 2: 14
+Route 3: 1, 24
+
+Test Case 689:
+Route 1: 1, 216
+Route 2: 11
+Route 3: 1, 27
+
+Test Case 690:
+Route 1: 1, 369
+Route 2: 19
+Route 3: 1, 54
+
+Test Case 691:
+Route 1: 1, 311
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 692:
+Route 1: 1, 315
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 693:
+Route 1: 1, 123
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 694:
+Route 1: 1, 183
+Route 2: 15
+Route 3: 1, 19
+
+Test Case 695:
+Route 1: 1, 316
+Route 2: 18
+Route 3: 1, 20
+
+Test Case 696:
+Route 1: 1, 150
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 697:
+Route 1: 1, 121
+Route 2: 15
+Route 3: 1, 31
+
+Test Case 698:
+Route 1: 1, 153
+Route 2: 13
+Route 3: 1, 16
+
+Test Case 699:
+Route 1: 1, 147
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 700:
+Route 1: 1, 382
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 701:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 702:
+Route 1: 1, 227
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 703:
+Route 1: 1, 334
+Route 2: 10
+Route 3: 1, 13
+
+Test Case 704:
+Route 1: 1, 160
+Route 2: 14
+Route 3: 1, 28
+
+Test Case 705:
+Route 1: 1, 113
+Route 2: 12
+Route 3: 1, 28
+
+Test Case 706:
+Route 1: 1, 373
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 707:
+Route 1: 1, 280
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 708:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 709:
+Route 1: 1, 109
+Route 2: 11
+Route 3: 1, 27
+
+Test Case 710:
+Route 1: 1, 295
+Route 2: 11
+Route 3: 1, 13
+
+Test Case 711:
+Route 1: 1, 212
+Route 2: 12
+Route 3: 1, 17
+
+Test Case 712:
+Route 1: 1, 321
+Route 2: 10
+Route 3: 1, 18
+
+Test Case 713:
+Route 1: 1, 63
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 714:
+Route 1: 1, 188
+Route 2: 12
+Route 3: 1, 35
+
+Test Case 715:
+Route 1: 1, 401
+Route 2: 15
+Route 3: 1, 17
+
+Test Case 716:
+Route 1: 1, 196
+Route 2: 15
+Route 3: 1, 26
+
+Test Case 717:
+Route 1: 1, 281
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 718:
+Route 1: 1, 146
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 719:
+Route 1: 1, 153
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 720:
+Route 1: 1, 90
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 721:
+Route 1: 1, 129
+Route 2: 14
+Route 3: 1, 15
+
+Test Case 722:
+Route 1: 1, 281
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 723:
+Route 1: 1, 226
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 724:
+Route 1: 1, 41
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 725:
+Route 1: 1, 185
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 726:
+Route 1: 1, 239
+Route 2: 13
+Route 3: 1, 32
+
+Test Case 727:
+Route 1: 1, 338
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 728:
+Route 1: 1, 95
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 729:
+Route 1: 1, 83
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 730:
+Route 1: 1, 447
+Route 2: 16
+Route 3: 1, 52
+
+Test Case 731:
+Route 1: 1, 98
+Route 2: 11
+Route 3: 1, 15
+
+Test Case 732:
+Route 1: 1, 193
+Route 2: 21
+Route 3: 1, 28
+
+Test Case 733:
+Route 1: 1, 218
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 734:
+Route 1: 1, 162
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 735:
+Route 1: 1, 152
+Route 2: 17
+Route 3: 1, 40
+
+Test Case 736:
+Route 1: 1, 74
+Route 2: 15
+Route 3: 1, 19
+
+Test Case 737:
+Route 1: 1, 125
+Route 2: 13
+Route 3: 1, 38
+
+Test Case 738:
+Route 1: 1, 92
+Route 2: 11
+Route 3: 1, 17
+
+Test Case 739:
+Route 1: 1, 64
+Route 2: 16
+Route 3: 1, 25
+
+Test Case 740:
+Route 1: 1, 88
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 741:
+Route 1: 1, 183
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 742:
+Route 1: 1, 176
+Route 2: 12
+Route 3: 1, 37
+
+Test Case 743:
+Route 1: 1, 188
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 744:
+Route 1: 1, 407
+Route 2: 13
+Route 3: 1, 25
+
+Test Case 745:
+Route 1: 1, 24
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 746:
+Route 1: 1, 472
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 747:
+Route 1: 1, 181
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 748:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 749:
+Route 1: 1, 227
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 750:
+Route 1: 1, 182
+Route 2: 15
+Route 3: 1, 17
+
+Test Case 751:
+Route 1: 1, 122
+Route 2: 12
+Route 3: 1, 13
+
+Test Case 752:
+Route 1: 1, 251
+Route 2: 15
+Route 3: 1, 29
+
+Test Case 753:
+Route 1: 1, 327
+Route 2: 17
+Route 3: 1, 31
+
+Test Case 754:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 755:
+Route 1: 1, 88
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 756:
+Route 1: 1, 182
+Route 2: 10
+Route 3: 1, 39
+
+Test Case 757:
+Route 1: 1, 164
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 758:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 759:
+Route 1: 1, 118
+Route 2: 10
+Route 3: 1, 25
+
+Test Case 760:
+Route 1: 1, 236
+Route 2: 13
+Route 3: 1, 45
+
+Test Case 761:
+Route 1: 1, 151
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 762:
+Route 1: 1, 218
+Route 2: 17
+Route 3: 1, 25
+
+Test Case 763:
+Route 1: 1, 143
+Route 2: 14
+Route 3: 1, 18
+
+Test Case 764:
+Route 1: 1, 79
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 765:
+Route 1: 1, 214
+Route 2: 18
+Route 3: 1, 20
+
+Test Case 766:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 767:
+Route 1: 1, 181
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 768:
+Route 1: 1, 411
+Route 2: 17
+Route 3: 1, 33
+
+Test Case 769:
+Route 1: 1, 200
+Route 2: 16
+Route 3: 1, 20
+
+Test Case 770:
+Route 1: 1, 147
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 771:
+Route 1: 1, 36
+Route 2: 12
+Route 3: 1, 23
+
+Test Case 772:
+Route 1: 1, 262
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 773:
+Route 1: 1, 179
+Route 2: 14
+Route 3: 1, 16
+
+Test Case 774:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 775:
+Route 1: 1, 108
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 776:
+Route 1: 1, 388
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 777:
+Route 1: 1, 192
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 778:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 779:
+Route 1: 1, 222
+Route 2: 15
+Route 3: 1, 15
+
+Test Case 780:
+Route 1: 1, 227
+Route 2: 12
+Route 3: 1, 20
+
+Test Case 781:
+Route 1: 1, 263
+Route 2: 15
+Route 3: 1, 20
+
+Test Case 782:
+Route 1: 1, 113
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 783:
+Route 1: 1, 235
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 784:
+Route 1: 1, 68
+Route 2: 11
+Route 3: 1, 31
+
+Test Case 785:
+Route 1: 1, 128
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 786:
+Route 1: 1, 179
+Route 2: 11
+Route 3: 1, 17
+
+Test Case 787:
+Route 1: 1, 149
+Route 2: 12
+Route 3: 1, 20
+
+Test Case 788:
+Route 1: 1, 295
+Route 2: 11
+Route 3: 1, 41
+
+Test Case 789:
+Route 1: 1, 149
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 790:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 791:
+Route 1: 1, 195
+Route 2: 10
+Route 3: 1, 14
+
+Test Case 792:
+Route 1: 1, 199
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 793:
+Route 1: 1, 402
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 794:
+Route 1: 1, 236
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 795:
+Route 1: 1, 149
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 796:
+Route 1: 1, 160
+Route 2: 13
+Route 3: 1, 33
+
+Test Case 797:
+Route 1: 1, 102
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 798:
+Route 1: 1, 83
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 799:
+Route 1: 1, 92
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 800:
+Route 1: 1, 67
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 801:
+Route 1: 1, 141
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 802:
+Route 1: 1, 285
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 803:
+Route 1: 1, 200
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 804:
+Route 1: 1, 52
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 805:
+Route 1: 1, 141
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 806:
+Route 1: 1, 67
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 807:
+Route 1: 1, 111
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 808:
+Route 1: 1, 145
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 809:
+Route 1: 1, 168
+Route 2: 12
+Route 3: 1, 48
+
+Test Case 810:
+Route 1: 1, 138
+Route 2: 16
+Route 3: 1, 22
+
+Test Case 811:
+Route 1: 1, 213
+Route 2: 13
+Route 3: 1, 41
+
+Test Case 812:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 813:
+Route 1: 1, 184
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 814:
+Route 1: 1, 78
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 815:
+Route 1: 1, 282
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 816:
+Route 1: 1, 454
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 817:
+Route 1: 1, 207
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 818:
+Route 1: 1, 177
+Route 2: 16
+Route 3: 1, 16
+
+Test Case 819:
+Route 1: 1, 365
+Route 2: 12
+Route 3: 1, 13
+
+Test Case 820:
+Route 1: 1, 130
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 821:
+Route 1: 1, 400
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 822:
+Route 1: 1, 116
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 823:
+Route 1: 1, 287
+Route 2: 12
+Route 3: 1, 19
+
+Test Case 824:
+Route 1: 1, 213
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 825:
+Route 1: 1, 189
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 826:
+Route 1: 1, 170
+Route 2: 16
+Route 3: 1, 22
+
+Test Case 827:
+Route 1: 1, 200
+Route 2: 11
+Route 3: 1, 13
+
+Test Case 828:
+Route 1: 1, 124
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 829:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 830:
+Route 1: 1, 218
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 831:
+Route 1: 1, 30
+Route 2: 15
+Route 3: 1, 16
+
+Test Case 832:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 833:
+Route 1: 1, 176
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 834:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 835:
+Route 1: 1, 453
+Route 2: 18
+Route 3: 1, 58
+
+Test Case 836:
+Route 1: 1, 239
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 837:
+Route 1: 1, 114
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 838:
+Route 1: 1, 474
+Route 2: 14
+Route 3: 1, 36
+
+Test Case 839:
+Route 1: 1, 86
+Route 2: 15
+Route 3: 1, 22
+
+Test Case 840:
+Route 1: 1, 151
+Route 2: 18
+Route 3: 1, 25
+
+Test Case 841:
+Route 1: 1, 111
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 842:
+Route 1: 1, 83
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 843:
+Route 1: 1, 112
+Route 2: 12
+Route 3: 1, 35
+
+Test Case 844:
+Route 1: 1, 115
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 845:
+Route 1: 1, 272
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 846:
+Route 1: 1, 125
+Route 2: 14
+Route 3: 1, 27
+
+Test Case 847:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 848:
+Route 1: 1, 369
+Route 2: 12
+Route 3: 1, 17
+
+Test Case 849:
+Route 1: 1, 141
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 850:
+Route 1: 1, 361
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 851:
+Route 1: 1, 155
+Route 2: 17
+Route 3: 1, 21
+
+Test Case 852:
+Route 1: 1, 173
+Route 2: 18
+Route 3: 1, 19
+
+Test Case 853:
+Route 1: 1, 171
+Route 2: 13
+Route 3: 1, 20
+
+Test Case 854:
+Route 1: 1, 188
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 855:
+Route 1: 1, 118
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 856:
+Route 1: 1, 356
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 857:
+Route 1: 1, 215
+Route 2: 15
+Route 3: 1, 20
+
+Test Case 858:
+Route 1: 1, 499
+Route 2: 13
+Route 3: 1, 13
+
+Test Case 859:
+Route 1: 1, 100
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 860:
+Route 1: 1, 71
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 861:
+Route 1: 1, 268
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 862:
+Route 1: 1, 203
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 863:
+Route 1: 1, 250
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 864:
+Route 1: 1, 75
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 865:
+Route 1: 1, 426
+Route 2: 18
+Route 3: 1, 18
+
+Test Case 866:
+Route 1: 1, 194
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 867:
+Route 1: 1, 49
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 868:
+Route 1: 1, 118
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 869:
+Route 1: 1, 213
+Route 2: 23
+Route 3: 1, 30
+
+Test Case 870:
+Route 1: 1, 559
+Route 2: 14
+Route 3: 1, 16
+
+Test Case 871:
+Route 1: 1, 170
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 872:
+Route 1: 1, 124
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 873:
+Route 1: 1, 95
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 874:
+Route 1: 1, 796
+Route 2: 20
+Route 3: 1, 48
+
+Test Case 875:
+Route 1: 1, 65
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 876:
+Route 1: 1, 211
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 877:
+Route 1: 1, 265
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 878:
+Route 1: 1, 319
+Route 2: 15
+Route 3: 1, 16
+
+Test Case 879:
+Route 1: 1, 126
+Route 2: 10
+Route 3: 1, 32
+
+Test Case 880:
+Route 1: 1, 243
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 881:
+Route 1: 1, 311
+Route 2: 11
+Route 3: 1, 12
+
+Test Case 882:
+Route 1: 1, 257
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 883:
+Route 1: 1, 135
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 884:
+Route 1: 1, 144
+Route 2: 10
+Route 3: 1, 18
+
+Test Case 885:
+Route 1: 1, 83
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 886:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 887:
+Route 1: 1, 101
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 888:
+Route 1: 1, 271
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 889:
+Route 1: 1, 187
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 890:
+Route 1: 1, 69
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 891:
+Route 1: 1, 191
+Route 2: 11
+Route 3: 1, 19
+
+Test Case 892:
+Route 1: 1, 158
+Route 2: 10
+Route 3: 1, 11
+
+Test Case 893:
+Route 1: 1, 183
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 894:
+Route 1: 1, 145
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 895:
+Route 1: 1, 119
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 896:
+Route 1: 1, 64
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 897:
+Route 1: 1, 250
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 898:
+Route 1: 1, 474
+Route 2: 12
+Route 3: 1, 14
+
+Test Case 899:
+Route 1: 1, 92
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 900:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 901:
+Route 1: 1, 169
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 902:
+Route 1: 1, 392
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 903:
+Route 1: 1, 190
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 904:
+Route 1: 1, 365
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 905:
+Route 1: 1, 151
+Route 2: 15
+Route 3: 1, 19
+
+Test Case 906:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 907:
+Route 1: 1, 340
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 908:
+Route 1: 1, 238
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 909:
+Route 1: 1, 26
+Route 2: 15
+Route 3: 1, 20
+
+Test Case 910:
+Route 1: 1, 349
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 911:
+Route 1: 1, 117
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 912:
+Route 1: 1, 218
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 913:
+Route 1: 1, 216
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 914:
+Route 1: 1, 170
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 915:
+Route 1: 1, 155
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 916:
+Route 1: 1, 175
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 917:
+Route 1: 1, 189
+Route 2: 10
+Route 3: 1, 21
+
+Test Case 918:
+Route 1: 1, 162
+Route 2: 13
+Route 3: 1, 28
+
+Test Case 919:
+Route 1: 1, 225
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 920:
+Route 1: 1, 120
+Route 2: 13
+Route 3: 1, 24
+
+Test Case 921:
+Route 1: 1, 149
+Route 2: 12
+Route 3: 1, 29
+
+Test Case 922:
+Route 1: 1, 218
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 923:
+Route 1: 1, 48
+Route 2: 12
+Route 3: 1, 15
+
+Test Case 924:
+Route 1: 1, 145
+Route 2: 20
+Route 3: 1, 21
+
+Test Case 925:
+Route 1: 1, 220
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 926:
+Route 1: 1, 109
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 927:
+Route 1: 1, 171
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 928:
+Route 1: 1, 130
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 929:
+Route 1: 1, 286
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 930:
+Route 1: 1, 191
+Route 2: 12
+Route 3: 1, 16
+
+Test Case 931:
+Route 1: 1, 439
+Route 2: 20
+Route 3: 1, 22
+
+Test Case 932:
+Route 1: 1, 83
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 933:
+Route 1: 1, 84
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 934:
+Route 1: 1, 280
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 935:
+Route 1: 1, 62
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 936:
+Route 1: 1, 264
+Route 2: 11
+Route 3: 1, 22
+
+Test Case 937:
+Route 1: 1, 256
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 938:
+Route 1: 1, 176
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 939:
+Route 1: 1, 141
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 940:
+Route 1: 1, 173
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 941:
+Route 1: 1, 122
+Route 2: 16
+Route 3: 1, 17
+
+Test Case 942:
+Route 1: 1, 104
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 943:
+Route 1: 1, 116
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 944:
+Route 1: 1, 193
+Route 2: 12
+Route 3: 1, 37
+
+Test Case 945:
+Route 1: 1, 201
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 946:
+Route 1: 1, 177
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 947:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 948:
+Route 1: 1, 83
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 949:
+Route 1: 1, 319
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 950:
+Route 1: 1, 245
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 951:
+Route 1: 1, 181
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 952:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 953:
+Route 1: 1, 128
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 954:
+Route 1: 1, 116
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 955:
+Route 1: 1, 470
+Route 2: 12
+Route 3: 1, 21
+
+Test Case 956:
+Route 1: 1, 114
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 957:
+Route 1: 1, 144
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 958:
+Route 1: 1, 93
+Route 2: 11
+Route 3: 1, 15
+
+Test Case 959:
+Route 1: 1, 176
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 960:
+Route 1: 1, 153
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 961:
+Route 1: 1, 282
+Route 2: 14
+Route 3: 1, 21
+
+Test Case 962:
+Route 1: 1, 154
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 963:
+Route 1: 1, 256
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 964:
+Route 1: 1, 234
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 965:
+Route 1: 1, 169
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 966:
+Route 1: 1, 442
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 967:
+Route 1: 1, 100
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 968:
+Route 1: 1, 154
+Route 2: 10
+Route 3: 1, 12
+
+Test Case 969:
+Route 1: 1, 141
+Route 2: 11
+Route 3: 1, 11
+
+Test Case 970:
+Route 1: 1, 124
+Route 2: 13
+Route 3: 1, 38
+
+Test Case 971:
+Route 1: 1, 113
+Route 2: 13
+Route 3: 1, 14
+
+Test Case 972:
+Route 1: 1, 107
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 973:
+Route 1: 1, 198
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 974:
+Route 1: 1, 168
+Route 2: 11
+Route 3: 1, 19
+
+Test Case 975:
+Route 1: 1, 110
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 976:
+Route 1: 1, 227
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 977:
+Route 1: 1, 91
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 978:
+Route 1: 1, 466
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 979:
+Route 1: 1, 124
+Route 2: 12
+Route 3: 1, 12
+
+Test Case 980:
+Route 1: 1, 184
+Route 2: 12
+Route 3: 1, 26
+
+Test Case 981:
+Route 1: 1, 214
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 982:
+Route 1: 1, 135
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 983:
+Route 1: 1, 159
+Route 2: 17
+Route 3: 1, 19
+
+Test Case 984:
+Route 1: 1, 184
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 985:
+Route 1: 1, 119
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 986:
+Route 1: 1, 77
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 987:
+Route 1: 1, 98
+Route 2: 6
+Route 3: 1, 6
+
+Test Case 988:
+Route 1: 1, 192
+Route 2: 11
+Route 3: 1, 16
+
+Test Case 989:
+Route 1: 1, 112
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 990:
+Route 1: 1, 149
+Route 2: 14
+Route 3: 1, 14
+
+Test Case 991:
+Route 1: 1, 232
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 992:
+Route 1: 1, 187
+Route 2: 10
+Route 3: 1, 15
+
+Test Case 993:
+Route 1: 1, 334
+Route 2: 10
+Route 3: 1, 10
+
+Test Case 994:
+Route 1: 1, 162
+Route 2: 9
+Route 3: 1, 9
+
+Test Case 995:
+Route 1: 1, 263
+Route 2: 8
+Route 3: 1, 8
+
+Test Case 996:
+Route 1: 1, 31
+Route 2: 7
+Route 3: 1, 7
+
+Test Case 997:
+Route 1: 1, 319
+Route 2: 5
+Route 3: 1, 5
+
+Test Case 998:
+Route 1: 1, 258
+Route 2: 17
+Route 3: 1, 17
+
+Test Case 999:
+Route 1: 0, No route
+Route 2: 0
+Route 3: 0, 0
+
+Test Case 1000:
+Route 1: 1, 116
+Route 2: 5
+Route 3: 1, 5
+
