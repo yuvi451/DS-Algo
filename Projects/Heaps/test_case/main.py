@@ -3,103 +3,144 @@ import straw_hat
 import treasure
 import sys
 
-sys.setrecursionlimit(10**6)
-            
-class Parser():
+sys.setrecursionlimit(10 ** 6)
+
+
+class Parser:
     def __init__(self, filename):
         self.filename = filename
         self.data = []
         self.read_data()
-        
+
     def read_data(self):
         with open(self.filename, 'r') as f:
-            for line in f:
-                self.data.append(line.strip())
-    
+            # skip blank lines
+            self.data = [line.strip() for line in f if line.strip()]
+
     def parse(self):
-        pass
+        raise NotImplementedError("Subclasses must implement parse()")
+
 
 class ParserTreasure(Parser):
     def parse(self):
-        m = int(self.data[0])
+        if not self.data:
+            raise ValueError('Invalid Input: empty file')
+        try:
+            m = int(self.data[0])
+        except ValueError:
+            raise ValueError('Invalid Input: first line must be integer')
+
         treasury = straw_hat.StrawHatTreasury(m)
-        for i in range(1, len(self.data)):
-            try:
-                query = self.data[i].split()
-                query_type = query[0]
-                if query_type == 'Add':
-                    id, size, arrival_time = query[1], query[2], query[3]
-                    id = int(id)
-                    size = int(size)
-                    arrival_time = int(arrival_time)
-            except:
-                raise ValueError('Invalid Input')
-            if query_type == 'Add':
+        for line in self.data[1:]:
+            parts = line.split()
+            cmd = parts[0]
+
+            if cmd == 'Add':
+                if len(parts) != 4:
+                    raise ValueError('Invalid Input')
                 try:
-                    treasure_obj = treasure.Treasure(id, size, arrival_time)
-                    treasury.add_treasure(treasure_obj)
-                    print(f'Treasure {id} added to treasury')
-                except:
-                    print(f"Cannot add treasure {id} to treasury")
-            elif query_type == 'Get':
+                    tid = int(parts[1])
+                    size = int(parts[2])
+                    arrival = int(parts[3])
+                except ValueError:
+                    raise ValueError('Invalid Input')
+
                 try:
-                processed = treasury.get_completion_time()
-                print('Completion Time:', [(treasure_obj.id, treasure_obj.completion_time) for treasure_obj in processed])
-                except:
+                    t_obj = treasure.Treasure(tid, size, arrival)
+                    treasury.add_treasure(t_obj)
+                    print(f'Treasure {tid} added to treasury')
+                except Exception:
+                    print(f'Cannot add treasure {tid} to treasury')
+
+            elif cmd == 'Get':
+                if len(parts) != 1:
+                    raise ValueError('Invalid Input')
+                try:
+                    processed = treasury.get_completion_time()
+                    results = [(t.id, t.completion_time) for t in processed]
+                    print('Completion Time:', results)
+                except Exception:
                     print('Cannot get completion time')
+
             else:
                 raise ValueError('Invalid Input')
 
+
 class ParserHeap(Parser):
-    def __init__(self, filename, comparison = lambda a, b: a<b):
+    def __init__(self, filename, comparison=lambda a, b: a < b):
         super().__init__(filename)
         self.comp = comparison
-    
+
     def parse(self):
         h = heap.Heap(self.comp, [])
-        num = 0
-        for i in range(len(self.data)):
-            query = self.data[i].split()
-            if query[0] == 'Insert':
+        count = 0
+
+        for line in self.data:
+            parts = line.split()
+            if not parts:
+                continue
+            cmd = parts[0]
+
+            if cmd == 'Insert':
+                if len(parts) != 2:
+                    raise ValueError('Invalid Input')
                 try:
-                    h.insert(int(query[1]))
-                    num += 1
-                    print(f'{query[1]} inserted')
-                except:
-                    print(f'Cannot insert {query[1]}')
-            elif query[0] == 'Extract':
+                    value = int(parts[1])
+                except ValueError:
+                    raise ValueError('Invalid Input')
                 try:
-                    print(f'{h.extract()} extracted')
-                    num -= 1
-                except:
+                    h.insert(value)
+                    count += 1
+                    print(f'{value} inserted')
+                except Exception:
+                    print(f'Cannot insert {value}')
+
+            elif cmd == 'Extract':
+                if len(parts) != 1:
+                    raise ValueError('Invalid Input')
+                try:
+                    val = h.extract()
+                    count -= 1
+                    print(f'{val} extracted')
+                except Exception:
                     print('Cannot extract')
-            elif query[0] == 'Top':
+
+            elif cmd == 'Top':
+                if len(parts) != 1:
+                    raise ValueError('Invalid Input')
                 try:
-                    print(f'Top: {h.top()}')
-                except:
+                    top_val = h.top()
+                    print(f'Top: {top_val}')
+                except Exception:
                     print('Cannot get top')
-            elif query[0] == 'Print':
+
+            elif cmd == 'Print':
+                if len(parts) != 1:
+                    raise ValueError('Invalid Input')
                 try:
-                    for i in range(num):
-                        print(h.extract(), end = ' ')
-                        num -= 1
-                    print()
-                except:
+                    items = []
+                    while count > 0:
+                        items.append(str(h.extract()))
+                        count -= 1
+                    print(' '.join(items))
+                except Exception:
                     print('Cannot print')
+
             else:
                 raise ValueError('Invalid Input')
-            
+
+
 if __name__ == '__main__':
     print("----------tc_heap1.txt----------")
     parser = ParserHeap('tc_heap1.txt')
     parser.parse()
     print()
-    
+
     print("----------tc_treasury1.txt----------")
     parser = ParserTreasure('tc_treasury1.txt')
     parser.parse()
     print()
-    
+
     print("----------tc_treasury2.txt----------")
     parser = ParserTreasure('tc_treasury2.txt')
     parser.parse()
