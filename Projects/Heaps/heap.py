@@ -1,11 +1,8 @@
-def get_load(a, t):
-    return max(0, a.load - (t - a.last_load_time))
-
 class Heap:
 
     def __init__(self, comparison_function, init_array):
         self.comparator = comparison_function
-        self.heap = init_array
+        self.heap = init_array[:]
         for i in range(len(self.heap) - 1, -1, -1):
             self._shift_down(i)
 
@@ -17,15 +14,15 @@ class Heap:
             parent = (i - 1) // 2
 
     def _shift_down(self, i):
-        left = 2 * i + 1
-        right = 2 * i + 2
+        left = 2*i + 1
+        right = 2*i + 2
         while (left < len(self.heap) and self.comparator(self.heap[left], self.heap[i])) or (
                 right < len(self.heap) and self.comparator(self.heap[right], self.heap[i])):
             t = left if (right >= len(self.heap) or self.comparator(self.heap[left], self.heap[right])) else right
             self.heap[i], self.heap[t] = self.heap[t], self.heap[i]
             i = t
-            left = 2 * i + 1
-            right = 2 * i + 2
+            left = 2*i + 1
+            right = 2*i + 2
 
     def insert(self, value):
         self.heap.append(value)
@@ -42,31 +39,3 @@ class Heap:
 
     def top(self):
         return self.heap[0] if len(self.heap) > 0 else None
-
-
-    def insert_1(self, a, t):
-        self.heap.append(a)
-        i = len(self.heap) - 1
-        parent = (i - 1) // 2
-        while i != 0 and get_load(self.heap[parent], t) > get_load(self.heap[i], t):
-            self.heap[i], self.heap[parent] = self.heap[parent], self.heap[i]
-            i = parent
-            parent = (i - 1) // 2
-
-    def extract_1(self, t):
-        if len(self.heap) == 0:
-            return None
-        val = self.heap[0]
-        self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
-        self.heap.pop()
-        i = 0
-        left = 2 * i + 1
-        right = 2 * i + 2
-        while (left < len(self.heap) and get_load(self.heap[left], t) < get_load(self.heap[i], t)) or (
-                right < len(self.heap) and get_load(self.heap[right], t) < get_load(self.heap[i], t)):
-            p = left if (right >= len(self.heap) or get_load(self.heap[left], t) < get_load(self.heap[right], t)) else right
-            self.heap[i], self.heap[p] = self.heap[p], self.heap[i]
-            i = p
-            left = 2 * i + 1
-            right = 2 * i + 2
-        return val
