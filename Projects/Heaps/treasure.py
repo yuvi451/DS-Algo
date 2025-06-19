@@ -4,18 +4,9 @@ class Treasure:
         self.id = id
         self.size = size
         self.arrival_time = arrival_time
-        self.completion_time = 0
-        self.processed_time = 0
-        self.person_id = None
+        self.completion_time = None
 
     def remaining_size(self):
-        return self.size - self.processed_time
+        return self.size
 
-    def priority(self):
-        return - self.arrival_time - self.remaining_size()
 
-    def copy(self):
-        new_treasure = Treasure(self.id, self.size, self.arrival_time)
-        new_treasure.completion_time = self.completion_time
-        new_treasure.processed_time = self.processed_time
-        return new_treasure
