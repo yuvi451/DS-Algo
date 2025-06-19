@@ -1,39 +1,42 @@
-from crewmate import *
-from treasure import *
+from crewmate import CrewMate
+from heap import Heap
+from treasure import Treasure
 
-def min_heap(a, b):
-    if a.load < b.load:
-        return True
+def comp(C1, C2):
+    # here crewmate C1 received the latest treasure and is being inserted back into the heap
+    # current time = C1.last_load_time = arrival time of latest treasure
+    # C1's load is updated at current time but C2's load is not so...
+    p1 = C1.load
+    t = C2.load - (C1.last_load_time - C2.last_load_time)
+    p2 = t if t > 0 else 0  # load of crewmate C2 at current time
+
+    if p1 <= p2: return True
     return False
 
 class StrawHatTreasury:
 
     def __init__(self, m):
-        self.all_crewmates = [0]*(m + 1)
-        self.crew = [CrewMate(i) for i in range(1, m + 1)]
-        self.heap_c = Heap(min_heap, self.crew)
-        self.crewmates_to_process = []
-    def add_treasure(self, trsr):
-        person = self.heap_c.extract_1(trsr.arrival_time)
-        if person:
-            if self.all_crewmates[person.id] == 0:
-                self.all_crewmates[person.id] = 1
-                self.crewmates_to_process.append(person)
-            person.add_t(trsr)
-            person.load = max(0, person.load - (trsr.arrival_time - person.last_load_time))
-            person.load += trsr.size
-            person.last_load_time = trsr.arrival_time
-            self.heap_c.insert_1(person, trsr.arrival_time)
+        self.all_crewmates = [CrewMate(i) for i in range(1, m + 1)]
+        self.crewmate_heap = Heap(comp, self.all_crewmates)
+
+    def add_treasure(self, treasure):
+        crewmate = self.crewmate_heap.extract()
+        crewmate.add(treasure)
+        self.crewmate_heap.insert(crewmate)
+
+    def copy(self, T):
+        return Treasure(T.id, T.size, T.arrival_time)
 
     def get_completion_time(self):
-        a = []
-        for i in self.crewmates_to_process:
-            a.extend(i.get_compltn_time())
-        return sorted(a, key=lambda x:x.id)
+       a = []
+       for crewmate in self.crewmate_heap.heap:
+           a.extend(crewmate.processed_treasures)
 
+           last_load_time = crewmate.last_load_time
+           for treasure in crewmate.pq.heap:
+               T = self.copy(treasure)
+               T.completion_time = last_load_time + T.remaining_size()
+               a.append(T)
+               last_load_time += T.remaining_size()
 
-
-
-
-
-
+       return sorted(a, key=lambda x: x.id)
