@@ -1,4 +1,10 @@
 int PrimsAlgorithm(ll n, vvl edges, vvl& ans){
+        /* 
+        all nodes that have been visited are connected by some sort of MST among them
+        at this instant the priority queue holds all the outgoing edges from all the nodes
+        and we pick up the smallest outgoing edge that expands our MST
+        */
+    
     vector<vector<pair<int, int>>>adj(n + 1);
     for(auto it: edges){
         int u = it[0], v = it[1], wt = it[2];
