@@ -1,39 +1,30 @@
-struct Compare {
-    bool operator()(const vl& a, const vl& b) {
-        return a[0] > b[0]; 
+int PrimsAlgorithm(ll n, vvl edges, vvl& ans){
+    vector<vector<pair<int, int>>>adj(n + 1);
+    for(auto it: edges){
+        int u = it[0], v = it[1], wt = it[2];
+        adj[u].push_back({v, wt});
+        adj[v].push_back({u, wt});
     }
-};
-
-void PrimsAlgorithm(ll n, vvl edges, vvl& ans){
-    vl visited(n + 1);
-    ll mst = 0;
-    vector <vector<pr>>adj(n + 1);
-  
-    fora(x, edges){
-        adj[x[0]].pb({x[1], x[2]});
-        adj[x[1]].pb({x[0], x[2]});
-    }
-  
-    priority_queue <vl, vvl, Compare> pq;
-    pq.push({0, 0, -1});
-    // {weight, node, parent}
-  
-    while (!(pq.empty())){
-        vl v = pq.top();
+    
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>>pq;
+    pq.push({0, 0});
+    int ans = 0;
+    vector<int>visited(n + 1);
+    
+    while (!pq.empty()){
+        int wt = pq.top().first;
+        int node = pq.top().second;
         pq.pop();
-        if (visited[v[1]]) continue;
-        visited[v[1]] = 1;
-        mst += v[0];
-        if (v[2] != -1){
-            ans.pb({v[2], v[1]});
-        }
-        fora(x, adj[v[1]]){
-            if (!(visited[x.first])){
-                pq.push({x.second, x.first, v[1]});
-            }
+        
+        if (visited[node]) continue;
+        ans += wt;
+        visited[node] = 1;
+        
+        for(auto it: adj[node]){
+            pq.push({it.second, it.first});
         }
     }
-    cout<<mst;
+    return ans;
 }
 
 //inputs
