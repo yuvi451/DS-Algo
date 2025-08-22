@@ -1,0 +1,21 @@
+{
+  "name": "hub",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "bun run index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "@types/bs58": "^4.0.4",
+    "@types/bun": "^1.2.20",
+    "bs58": "^6.0.0",
+    "bun": "^1.2.20",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1"
+  }
+}
