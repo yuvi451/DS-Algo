@@ -60,6 +60,7 @@ Node* RemoveKthElement(Node* head, int K){
             Node* t = head;
             head = head->next;
             head->prev = nullptr;
+            t->next = nullptr;
             delete t;
             return head;
         } else {
