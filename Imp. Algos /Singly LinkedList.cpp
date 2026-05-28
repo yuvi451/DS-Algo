@@ -38,6 +38,19 @@ void PrintLL(Node* head){
     cout<<'\n';
 }
 
+Node* reverseLL(Node* head) {
+    Node* curr = head;
+    Node* prev = nullptr;
+    while (curr){
+        Node* next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        if (next == nullptr) break;
+        curr = next;
+    }
+    return curr;
+}
+
 Node* RemoveKthElement(Node* head, int K){
     if (head == nullptr) return head;
 
