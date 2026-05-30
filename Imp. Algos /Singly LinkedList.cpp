@@ -38,6 +38,69 @@ void PrintLL(Node* head){
     cout<<'\n';
 }
 
+Node* Add(Node* head1, Node* head2){
+    Node* temp1 = ReverseLL(head1);
+    Node* temp2 = ReverseLL(head2);
+
+    Node* head = new Node(0);
+    Node* t = head;
+
+    int carry = 0;
+    while (temp1 && temp2){
+        int sum = temp1->data + temp2->data + carry;
+        if (sum <= 9){
+            carry = 0;
+            Node* n = new Node(sum);
+            t->next = n;
+            t = n;
+        } else {
+            carry = 1;
+            Node* n = new Node(sum % 10);
+            t->next = n;
+            t = n;
+        }
+        temp1 = temp1->next;
+        temp2 = temp2->next;
+    }
+
+    while (temp1){
+        int sum = temp1->data + carry;
+        if (sum <= 9){
+            carry = 0;
+            Node* n = new Node(sum);
+            t->next = n;
+            t = n;
+        } else {
+            carry = 1;
+            Node* n = new Node(sum % 10);
+            t->next = n;
+            t = n;
+        }
+        temp1 = temp1->next;
+    }
+
+    while (temp2){
+        int sum = temp2->data + carry;
+        if (sum <= 9){
+            carry = 0;
+            Node* n = new Node(sum);
+            t->next = n;
+            t = n;
+        } else {
+            carry = 1;
+            Node* n = new Node(sum % 10);
+            t->next = n;
+            t = n;
+        }
+        temp2 = temp2->next;
+    }
+
+    if (carry) {
+        t->next = new Node(1);
+    }
+    return ReverseLL(head->next);
+}
+
 Node* reverseLL(Node* head) {
     Node* curr = head;
     Node* prev = nullptr;
