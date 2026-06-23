@@ -62,6 +62,45 @@ void postOrderTraversal(Node* root){
     // 17 0 241 11 3 429 8 616 401 257 1 2 17 241 8 320
 }
 
+void allTraversals(Node* root) {
+    vector<int>preorder, inorder, postorder;
+    stack<pair<Node*, int>>st;
+    st.push({root, 1});
+
+    while(!st.empty()){
+        auto it = st.top();
+        st.pop();
+
+        if (it.second == 1){
+            preorder.push_back(it.first->data);
+
+            it.second = 2;
+            st.push(it);
+
+            if (it.first->left != NULL){
+                st.push({it.first->left, 1});
+            }
+        } else if (it.second == 2){
+            inorder.push_back(it.first->data);
+
+            it.second = 3;
+            st.push(it);
+
+            if (it.first->right != NULL){
+                st.push({it.first->right, 1});
+            }
+        } else {
+            postorder.push_back(it.first->data);
+        }
+    }
+    for(auto it: preorder) cout<<it<<" ";
+    cout<<'\n';
+    for(auto it: inorder) cout<<it<<" ";
+    cout<<'\n';
+    for(auto it: postorder) cout<<it<<" ";
+}
+
+
 int main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
