@@ -41,7 +41,7 @@ void inorder(Node* root){
             st.push(curr);
             curr = curr->left;
         }
-        // if curr == NULL means left node / subtree of st.top() has been processed so we move to the root
+        // if curr == NULL means left node / left subtree of st.top() has been processed so we move to the root
         // left -> root -> right
         curr = st.top();    // root
         st.pop();
@@ -93,11 +93,13 @@ void postorder_1stack(Node* root){
 
         // if curr == NULL then left subtree of st.top() has been processed so we move to the root;
         curr = st.top();    // root
+        // before doing anyhting we first check if the right subtree has been processed or not
         if (curr->right != NULL && curr->right != last_visited_node){
+            // if right subtree has not been processed
             curr = curr->right;
         } else {
-            // if curr->right == NULL means both left and right of st.top() have been processed so we print root i.e. stack.top()
-            // or if curr->right == last_visited_node means both left and right of st.top() have been processed so we print root i.e. stack.top()
+            // if curr->right == NULL means both left and right subtree of st.top() have been processed so we print root i.e. stack.top()
+            // or if curr->right == last_visited_node means both left and right subtree of st.top() have been processed so we print root i.e. stack.top()
             cout<<curr->data<<" ";
             last_visited_node = curr;
             st.pop();
