@@ -1,29 +1,35 @@
-void Dijkstra(vvl edges, int nodes, int root, vl& distance){
-    distance[root] = 0;
-    vector <vpr> adj(nodes + 1);
-    fora(x, edges){
-        adj[x[0]].pb({x[1], x[2]});
+vector<int> dijkstra(int V, vector<vector<int>> &edges, int src) {
+    vector<vector<pair<int, int>>>adj(V);
+    
+    for(auto it: edges){
+        int u = it[0], v = it[1], wt = it[2];
+        adj[u].push_back({v, wt});
+        adj[v].push_back({u, wt});
     }
-
-    vl processed(nodes + 1);
-
-    priority_queue <pr> pq;
-    pq.push({0, root});
-
-    while (!pq.empty(){
+    
+    vector<int>distance(V, 1e9);
+    distance[src] = 0;
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    pq.push({distance[src], src});
+    
+    while (!pq.empty()){
+        int dist = pq.top().first;
         int node = pq.top().second;
         pq.pop();
-
-        if (processed[node]) continue;
-        processed[node] = 1;
-
-        fora(x, adj[node]){
-            if (distance[x.first] > distance[node] + x.second){
-                distance[x.first] = distance[node] + x.second;
-                pq.push({-distance[x.first], x.first});
+        
+        if (dist > distance[node]) continue;
+        
+        for(auto it: adj[node]){
+            int wt = it.second;
+            int nextNode = it.first;
+            if (distance[nextNode] > dist + wt){
+                distance[nextNode] = dist + wt;
+                pq.push({distance[nextNode], nextNode});
             }
         }
     }
+    
+    return distance;
 }
     
      //Does not work with graphs containing negative weights/negative cycles [gets stuck in infinite loop]
