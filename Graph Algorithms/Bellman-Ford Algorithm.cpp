@@ -1,30 +1,23 @@
-void BellmanFord(vvl edges, vl& distance, int nodes, int start, int& r){
-    distance[start] = 0;
-    forl(i, 0, nodes - 1){
-        fora(x, edges){
-            if (distance[x[1]] > distance[x[0]] + x[2]){
-                distance[x[1]] = distance[x[0]] + x[2];
+vector<int> bellmanFord(int V, vector<vector<int>>& edges, int src) {
+    vector<int>distance(V, 1e8);
+    distance[src] = 0;
+    for(int i = 0; i < V - 1; i++){
+        for(auto& it: edges){
+            int u = it[0], v = it[1], w = it[2];
+            if (distance[u] != 1e8 && distance[v] > distance[u] + w){
+                distance[v] = distance[u] + w;
             }
         }
     }
-
-    //Check for negative cycles
-
-    fora(x, edges){
-        if (distance[x[1]] > distance[x[0]] + x[2]){
-            r++;
-        }
-        break;
+    
+    for(auto& it: edges){
+        int u = it[0], v = it[1], w = it[2];
+        if (distance[u] != 1e8 && distance[v] > distance[u] + w) return {-1};
     }
+    
+    return distance;
 }
 
-    //value of r tells us about negative cycles
-
-    //inputs
-    vl distance(nodes + 1, inf);  
-    int r = 0;
-
-    //edge adjacency form where each edge is represented as {a, b, w} : starting node, ending node, weight/length of edge
     //distance[x] = shortest distance of node x from starting node
 
     // if number of nodes = n (size) : We do exactly n - 1 iterations
