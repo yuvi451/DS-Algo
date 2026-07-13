@@ -1,42 +1,36 @@
-void FloydWarshall(vvl edges, vvl& distance, int nodes){
-    fora(x, edges){
-        distance[x[0]][x[1]] = x[2];
-        distance[x[1]][x[0]] = x[2];
+vector<vector<int>> floydWarshall(vector<vector<int>>& edges, int n){
+    // nodes 0 - n-1
+    vector<vector<int>>distance(n, vector<int>(n, 1e8));
+    for(auto it: edges){
+        int u = it[0], v = it[1], w = it[2];
+        distance[u][v] = w;
+        // if undirected graph
+        distance[v][u] = w;
     }
 
-    forl(i, 0, nodes + 1){
-        distance[i][i] = 0; 
-    }
+    for(int i = 0; i < n; i++) distance[i][i] = 0;
 
-    //nodes are 1 base indexed
-
-    forl(k, 1, nodes + 1){
-        forl(i, 1, nodes + 1){
-            forl(j, 1, nodes + 1){
-                if (distance[i][k] < inf && distance[k][j] < inf){
+    for(int k = 0; k < n; k++){
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                if (distance[i][k] != 1e8 && distance[k][j] != 1e8){
                     distance[i][j] = min(distance[i][j], distance[i][k] + distance[k][j]);
                 }
             }
         }
     }
+
+    return distance;
 }
 
+//Can detect negative cycles if distance[i][i] < 0 
 
-    //inputs
-    vvl distance(nodes + 1, vl(nodes + 1, inf));
-
-    //Can detect negative cycles if distance[i][i] < 0 
-
-    //adjacency list to adjacency matrix conversion. 
-    forl(i, 1, n + 1){
-        distance[i][i] = 0;
-        fora(x, adj[i]){
-            distance[i][x[0]] = x[1];
-        }
+for (int i = 0; i < n; i++) {
+    if (distance[i][i] < 0) {
+        // A negative-weight cycle exists.
     }
+}
 
-    //If adjacency matrix is given directly copy it and replace all zeroes with infinity
-
-    //Time complexity = O(n^3)
-    //Best suited for dense graphs and when you need shortest paths between all pairs of vertices. It works for graphs with both positive 
-    //and negative edge weights but without negative weight cycles.
+//Time complexity = O(n^3)
+//Best suited for dense graphs and when you need shortest paths between all pairs of vertices. It works for graphs with both positive 
+//and negative edge weights but without negative weight cycles.
