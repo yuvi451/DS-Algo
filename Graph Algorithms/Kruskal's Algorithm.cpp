@@ -49,28 +49,25 @@ class DisjointSet {
         }
 };
 
-class Solution {
-  public:
-    int spanningTree(int V, vector<vector<int>> adj[]) {
-        vector<vector<int>>edges;
-        for(int i = 0; i < V; i++){
-            for(auto it: adj[i]){
-                int u = i, v = it[0], wt = it[1];
-                edges.push_back({u, v, wt});
-            }
+int spanningTree(int V, vector<vector<int>> adj[]) {
+    vector<vector<int>>edges;
+    for(int i = 0; i < V; i++){
+        for(auto it: adj[i]){
+            int u = i, v = it[0], wt = it[1];
+            edges.push_back({u, v, wt});
         }
-        sort(edges.begin(), edges.end(), [](vector<int>&a, vector<int>&b) {
-            return a[2] < b[2];
-        });
-        int ans = 0;
-        DisjointSet ds(V);
-        for(auto it: edges){
-            if (ds.findPar(it[0]) != ds.findPar(it[1])){
-                ans += it[2];
-            }
-            ds.unionByRank(it[0], it[1]);
-            
-        }
-        return ans;
     }
-};
+    sort(edges.begin(), edges.end(), [](vector<int>&a, vector<int>&b) {
+        return a[2] < b[2];
+    });
+    int ans = 0;
+    DisjointSet ds(V);
+    for(auto it: edges){
+        if (ds.findPar(it[0]) != ds.findPar(it[1])){
+            ans += it[2];
+        }
+        ds.unionByRank(it[0], it[1]);
+        
+    }
+    return ans;
+}
