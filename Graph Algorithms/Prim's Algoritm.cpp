@@ -1,43 +1,72 @@
-int PrimsAlgorithm(ll n, vvl edges, vvl& ans){
-        /* 
-        all nodes that have been visited are connected by some sort of MST among them
-        at this instant the priority queue holds all the outgoing edges from all the nodes
-        and we pick up the smallest outgoing edge that expands our MST
-        */
-    
-    vector<vector<pair<int, int>>>adj(n + 1);
-    for(auto it: edges){
-        int u = it[0], v = it[1], wt = it[2];
-        adj[u].push_back({v, wt});
-        adj[v].push_back({u, wt});
-    }
-    
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>>pq;
-    pq.push({0, 0});
-    int ans = 0;
-    vector<int>visited(n + 1);
-    
-    while (!pq.empty()){
-        int wt = pq.top().first;
-        int node = pq.top().second;
-        pq.pop();
+/* 
+        all nodes that have been visited are connected by some sort of MST among them (P nodes connected by P-1 edges)
+        at this instant the priority queue holds all the outgoing edges from all these visited nodes
+        and we pick up the smallest outgoing edge that expands our MST i.e we add a new node through an edge and
+        add all the outgoing edges of the new node as well
         
-        if (visited[node]) continue;
-        ans += wt;
-        visited[node] = 1;
-        
-        for(auto it: adj[node]){
-            pq.push({it.second, it.first});
+        make sure to add only those edges that have not yet been visited
+*/
+
+// when only MST sum is to be returned
+int spanningTree(int V, vector<vector<int>>& edges) {
+        vector<vector<pair<int, int>>>adj(V);
+        for(auto it: edges){
+            int u = it[0], v = it[1], w = it[2];
+            adj[u].push_back({v, w});
+            adj[v].push_back({u, w});
         }
-    }
-    return ans;
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>>pq;
+        pq.push({0, 0});
+        vector<int>visited(V);
+        int sum = 0;
+
+        while (!pq.empty()){
+            int wt = pq.top().first, node = pq.top().second;
+            pq.pop();
+            
+            if (visited[node]) continue;
+            visited[node] = 1;
+            sum += wt;
+            
+            for(auto it: adj[node]){
+                if (!visited[it.first]) pq.push({it.second, it.first});
+            }
+        }
+        return sum;
 }
 
-//inputs
-ll n;
-vvl ans;
-vvl edges;
+// when entire MST is to be returned
+vector<pair<int, int>> spanningTree(int V, vector<vector<int>>& edges) {
+        vector<vector<pair<int, int>>>adj(V);
+        for(auto it: edges){
+            int u = it[0], v = it[1], w = it[2];
+            adj[u].push_back({v, w});
+            adj[v].push_back({u, w});
+        }
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>>pq;
+        pq.push({0, 0, -1});
+        vector<int>visited(V);
+        int sum = 0;
+        vector<pair<int, int>>v;
+        
+        while (!pq.empty()){
+            int node = pq.top()[1], par = pq.top()[2], wt = pq.top()[0];
+            pq.pop();
+            
+            if (visited[node]) continue;
+            visited[node] = 1;
+            sum += wt;
+            
+            if (par != -1) v.push_back({node, par});
+            
+            for(auto it: adj[node]){
+                if (!visited[it.first]){
+                    pq.push({it.second, it.first, node});
+                }
+            }
+        }
+        return v;
+    }
 
 // intuition of this algorithm : Greedy 
 // Time complexity = O(n + m*log(m))
-//here forming the adjacency list also takes up some time. If it is already given then that time is saved
