@@ -20,8 +20,9 @@ int spanningTree(int V, vector<vector<int>>& edges) {
         vector<int>visited(V);
         int sum = 0;
 
+        // E times
         while (!pq.empty()){
-            int wt = pq.top().first, node = pq.top().second;
+            int wt = pq.top().first, node = pq.top().second;        // logE
             pq.pop();
             
             if (visited[node]) continue;
@@ -29,6 +30,7 @@ int spanningTree(int V, vector<vector<int>>& edges) {
             sum += wt;
             
             for(auto it: adj[node]){
+                    // logE
                 if (!visited[it.first]) pq.push({it.second, it.first});  // be very careful about this !visited[it] thing, it saves memory
             }
         }
@@ -48,9 +50,10 @@ vector<pair<int, int>> spanningTree(int V, vector<vector<int>>& edges) {
         vector<int>visited(V);
         int sum = 0;
         vector<pair<int, int>>v;
-        
+
+        // E times
         while (!pq.empty()){
-            int node = pq.top()[1], par = pq.top()[2], wt = pq.top()[0];
+            int node = pq.top()[1], par = pq.top()[2], wt = pq.top()[0];        // logE
             pq.pop();
             
             if (visited[node]) continue;
@@ -60,6 +63,7 @@ vector<pair<int, int>> spanningTree(int V, vector<vector<int>>& edges) {
             if (par != -1) v.push_back({node, par});
             
             for(auto it: adj[node]){
+                    // logE
                 if (!visited[it.first]){        // be very careful about this !visited[it] thing, it saves memory
                     pq.push({it.second, it.first, node});
                 }
@@ -69,4 +73,4 @@ vector<pair<int, int>> spanningTree(int V, vector<vector<int>>& edges) {
     }
 
 // intuition of this algorithm : Greedy 
-// Time complexity = O(n + m*log(m))
+// Time complexity = O(E*logE)
