@@ -29,7 +29,7 @@ int spanningTree(int V, vector<vector<int>>& edges) {
             sum += wt;
             
             for(auto it: adj[node]){
-                if (!visited[it.first]) pq.push({it.second, it.first});
+                if (!visited[it.first]) pq.push({it.second, it.first});  // be very careful about this !visited[it] thing, it saves memory
             }
         }
         return sum;
@@ -60,7 +60,7 @@ vector<pair<int, int>> spanningTree(int V, vector<vector<int>>& edges) {
             if (par != -1) v.push_back({node, par});
             
             for(auto it: adj[node]){
-                if (!visited[it.first]){
+                if (!visited[it.first]){        // be very careful about this !visited[it] thing, it saves memory
                     pq.push({it.second, it.first, node});
                 }
             }
