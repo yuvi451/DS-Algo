@@ -1,3 +1,6 @@
+// Finds whether two elements belong to the same component or not in O(4*alpha) == O(1) time
+// if (ds.findUtlPar(i) == ds.findUltPar(j)) then i & j belong to the same component
+
 class DisjointSet {
     private: 
         vector<int>rank, size, parent;
@@ -13,7 +16,7 @@ class DisjointSet {
                 size[i] = 1;
             }
         }
-
+        // path compression happens
         int findPar(int x){
             if (parent[x] == x) return x;
             return parent[x] = findPar(parent[x]);
