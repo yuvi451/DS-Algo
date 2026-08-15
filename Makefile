@@ -42,8 +42,8 @@ test-integration: $(BUILD_DIR)/server_asan $(BUILD_DIR)/client_asan
 $(BUILD_DIR)/test_hashtable: $(TEST_DIR)/test_hashtable.cpp $(SRC_DIR)/hashtable.cpp $(SRC_DIR)/hashtable.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_hashtable.cpp $(SRC_DIR)/hashtable.cpp
 
-$(BUILD_DIR)/test_protocol: $(TEST_DIR)/test_protocol.c $(SRC_DIR)/protocol.c $(SRC_DIR)/protocol.h | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_protocol.c $(SRC_DIR)/protocol.c
+$(BUILD_DIR)/test_protocol: $(TEST_DIR)/test_protocol.cpp $(SRC_DIR)/protocol.cpp $(SRC_DIR)/protocol.h | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_protocol.cpp $(SRC_DIR)/protocol.cpp
 
 clean:
 	rm -rf $(BUILD_DIR)
