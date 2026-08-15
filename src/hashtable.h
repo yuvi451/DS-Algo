@@ -1,36 +1,54 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <vector>
 
-typedef struct HNode {
-    struct HNode *next;
-    uint64_t hcode;
-} HNode;
+struct HNode {
+    HNode *next = nullptr;
+    uint64_t hcode = 0;
+};
 
-typedef struct {
-    HNode **tab;
-    size_t mask;
-    size_t size;
-} HTab;
+using EqFn = bool (*)(const HNode *a, const HNode *b);
+using DeleteFn = std::function<void(HNode *)>;
 
-typedef struct {
-    HTab newer;
-    HTab older;
-    size_t migrate_pos;
-} HMap;
+class HMap {
+public:
+    HMap(EqFn eq, DeleteFn deleter);
+    ~HMap();
 
-typedef bool (*HEqFn)(HNode *node, HNode *key);
+    HMap(const HMap &) = delete;
+    HMap &operator=(const HMap &) = delete;
 
-void hm_init(HMap *map);
-void hm_insert(HMap *map, HNode *node);
-HNode *hm_lookup(HMap *map, HNode *key, HEqFn eq);
-HNode *hm_pop(HMap *map, HNode *key, HEqFn eq);
-size_t hm_size(const HMap *map);
-void hm_destroy(HMap *map, void (*free_node)(HNode *node));
+    void insert(HNode *node);
+    HNode *lookup(const HNode *key) const;
+    HNode *pop(const HNode *key);
+    size_t size() const;
 
-uint64_t hash_bytes(const uint8_t *data, size_t len);
+private:
+    struct HTab {
+        std::vector<HNode *> tab;
+        size_t mask = 0;
+        size_t size = 0;
+    };
+
+    static void htabInit(HTab &htab, size_t n);
+    static void htabInsert(HTab &htab, HNode *node);
+    static HNode **htabLookup(HTab &htab, const HNode *key, EqFn eq);
+    static HNode *htabDetach(HTab &htab, HNode **from);
+
+    void startResizing();
+    void helpRehashing();
+
+    EqFn eq_;
+    DeleteFn deleter_;
+    HTab newer_;
+    HTab older_;
+    size_t migratePos_ = 0;
+};
+
+uint64_t hashBytes(const uint8_t *data, size_t len);
 
 #endif

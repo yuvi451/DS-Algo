@@ -1,5 +1,7 @@
 CC := cc
 CFLAGS := -std=c11 -Wall -Wextra
+CXX := c++
+CXXFLAGS := -std=c++17 -Wall -Wextra
 RELEASE_FLAGS := -O2
 ASAN_FLAGS := -fsanitize=address -g
 
@@ -37,8 +39,8 @@ test-protocol: $(BUILD_DIR)/test_protocol
 test-integration: $(BUILD_DIR)/server_asan $(BUILD_DIR)/client_asan
 	$(TEST_DIR)/test_integration.sh
 
-$(BUILD_DIR)/test_hashtable: $(TEST_DIR)/test_hashtable.c $(SRC_DIR)/hashtable.c $(SRC_DIR)/hashtable.h | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_hashtable.c $(SRC_DIR)/hashtable.c
+$(BUILD_DIR)/test_hashtable: $(TEST_DIR)/test_hashtable.cpp $(SRC_DIR)/hashtable.cpp $(SRC_DIR)/hashtable.h | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_hashtable.cpp $(SRC_DIR)/hashtable.cpp
 
 $(BUILD_DIR)/test_protocol: $(TEST_DIR)/test_protocol.c $(SRC_DIR)/protocol.c $(SRC_DIR)/protocol.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_protocol.c $(SRC_DIR)/protocol.c
