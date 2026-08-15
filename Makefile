@@ -14,6 +14,12 @@ all: $(BUILD_DIR)/server $(BUILD_DIR)/client
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
+$(BUILD_DIR)/server: $(SRC_DIR)/server.c $(SRC_DIR)/hashtable.c $(SRC_DIR)/protocol.c $(SRC_DIR)/hashtable.h $(SRC_DIR)/protocol.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(RELEASE_FLAGS) -o $@ $(SRC_DIR)/server.c $(SRC_DIR)/hashtable.c $(SRC_DIR)/protocol.c
+
+$(BUILD_DIR)/client: $(SRC_DIR)/client.c $(SRC_DIR)/protocol.c $(SRC_DIR)/protocol.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(RELEASE_FLAGS) -o $@ $(SRC_DIR)/client.c $(SRC_DIR)/protocol.c
+
 test: test-hashtable test-protocol
 
 test-hashtable: $(BUILD_DIR)/test_hashtable
