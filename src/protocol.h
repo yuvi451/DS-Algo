@@ -34,6 +34,9 @@ private:
 bool encodeRequest(Buffer &out, const std::vector<std::string> &args);
 std::optional<std::vector<std::string>> parseRequest(const uint8_t *data, size_t len);
 
+// When data is empty, the len/data fields are omitted entirely, so a
+// RES_OK response for an empty-string value is indistinguishable on the
+// wire from a RES_OK/RES_NX response with no value.
 void encodeResponse(Buffer &out, ResponseStatus status, std::string_view data = {});
 
 struct Response {

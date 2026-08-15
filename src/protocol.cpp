@@ -1,5 +1,6 @@
 #include "protocol.h"
 
+#include <cassert>
 #include <cstring>
 #include <unistd.h>
 
@@ -12,6 +13,7 @@ void Buffer::append(std::string_view s) {
 }
 
 void Buffer::consume(size_t n) {
+    assert(n <= buf_.size());
     buf_.erase(buf_.begin(), buf_.begin() + static_cast<long>(n));
 }
 
