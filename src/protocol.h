@@ -28,6 +28,9 @@ int encode_request(Buffer *out, char **args, const size_t *arglens, size_t nargs
 int parse_request(const uint8_t *data, size_t len, char ***out_args, size_t **out_arglens, size_t *out_nargs);
 void free_request_args(char **args, size_t *arglens, size_t nargs);
 
+/* When datalen == 0, the len/data fields are omitted entirely, so a
+ * RES_OK response for an empty-string value is indistinguishable on the
+ * wire from a RES_OK/RES_NX response with no value. */
 void encode_response(Buffer *out, ResponseStatus status, const uint8_t *data, size_t datalen);
 int parse_response(const uint8_t *data, size_t len, ResponseStatus *out_status, const uint8_t **out_data, size_t *out_datalen);
 
