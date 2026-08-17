@@ -124,10 +124,15 @@ code(f"""
 """)
 
 code(r"""
-# Trim the news-collection window for a reasonable Kaggle runtime by default.
-# GDELT backfill walks this range in weekly chunks (~1 request/chunk); widen
-# it once you've confirmed the pipeline runs end to end.
-GDELT_START_DATE = (datetime.utcnow() - timedelta(days=2 * 365)).strftime("%Y-%m-%d")
+# News backfill matches the price lookback (PRICE_LOOKBACK_YEARS, see config
+# cell above) so sentiment features are available across the full training
+# history -- otherwise the years without matching news just fall back to
+# price-only features, which undercuts the whole point of this project.
+# GDELT backfill walks this range in weekly chunks (~1 request/chunk), so
+# this takes longer to collect (~10-15 min for 5 years) than a shorter
+# window would; shrink PRICE_LOOKBACK_YEARS in the config cell for a faster
+# smoke-test run.
+GDELT_START_DATE = (datetime.utcnow() - timedelta(days=PRICE_LOOKBACK_YEARS * 365)).strftime("%Y-%m-%d")
 GDELT_END_DATE = datetime.utcnow().strftime("%Y-%m-%d")
 """)
 
@@ -377,9 +382,10 @@ shap.summary_plot(shap_values, X_explain, show=True)
 # ---------------------------------------------------------------------------
 md("""## 12. Results summary
 
-Re-run cells above with a wider `GDELT_START_DATE` / more Optuna trials
-for a stronger final result -- the ranges above are tuned for a reasonable
-first end-to-end Kaggle run.""")
+Re-run cells above with more Optuna trials, or a longer `PRICE_LOOKBACK_YEARS`
+(which also widens the GDELT news backfill to match), for a stronger final
+result -- the defaults above are tuned for a reasonable first end-to-end
+Kaggle run.""")
 code(r"""
 print("=" * 70)
 print("RESULTS SUMMARY")
