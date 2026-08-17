@@ -50,20 +50,75 @@ architecture family, ~5.5M params, functionally the equivalent comparison point.
 ## Results
 
 *(Test set, n=450, 150/class. Frozen-backbone linear probe, 6 epochs, AdamW lr=1e-3, batch 32.
-CPU-only training — no GPU was available in this build environment.)*
+CPU-only training — no GPU was available in this build environment; see the note below on latency.)*
 
-<!-- RESULTS_TABLE -->
+| Model | Test Acc | F1 (start_fire) | Latency (ms, CPU) | Params (M) | Hard Examples |
+|---|---|---|---|---|---|
+| ResNet50 | 0.900 | 0.853 | 64.4 | 23.5 | 64 |
+| EfficientNet-B0 | 0.929 | 0.895 | 28.7 | 4.0 | 33 |
+| **ViT-Tiny** | **0.944** | **0.919** | **24.1** | 5.5 | 26 |
+
+ViT-Tiny wins on every axis here: highest accuracy, best `start_fire` F1, *and* lowest latency —
+despite EfficientNet-B0 having fewer parameters, ViT-Tiny's patch-embedding forward pass is
+cheaper per-image on CPU than EfficientNet-B0's depthwise convs. ResNet50 is both the slowest and
+least accurate of the three, making it the clear loser of this comparison for this task. Latency
+numbers are CPU (no GPU in this build environment); relative ordering, not absolute ms, is what's
+transferable — on GPU all three would be faster in roughly the same rank order.
 
 ![Comparison](results/plots/comparison.png)
 ![Confusion matrices](results/plots/confusion_matrices.png)
 
 ## Hard-example analysis
 
-<!-- HARD_EXAMPLE_ANALYSIS -->
+`start_fire` is the weakest class for every single model (F1 0.85–0.92, vs. 0.91–0.96 for `fire`
+and `no_fire`) and produces the most hard examples in every run (26–64, vs. single digits to
+low-teens for the other two classes on the better models). The confusion matrices point at one
+specific, dominant failure mode: **`start_fire` mistaken for `no_fire`** — ResNet50 gets this
+wrong on 23/150 (15%) of true `start_fire` test images, EfficientNet-B0 on 9%, ViT-Tiny on 6%.
+This is exactly the ambiguity the project set out to measure, not a labeling artifact — pulling
+actual images from `results/hard_examples/*/start_fire/` confirms it:
+
+- **Faint or backgrounded smoke reads as `no_fire`.** A street scene with hazy exhaust/dust near a
+  parked truck, and a shot of workers paving a road (heat shimmer + steam off hot asphalt), both
+  get called `no_fire` — the smoke/haze signal is present but small, diffuse, or embedded in a busy
+  scene rather than being the visual subject.
+- **Sunset-tinted industrial steam reads as `fire`.** A row of factory smokestacks venting steam
+  lit orange-pink by a sunset gets predicted `fire` with near-zero confidence in the true
+  `start_fire` label — the model appears to be keying on warm color statistics more than smoke
+  shape, and gets fooled by lighting that happens to mimic flame color.
+- **Some `start_fire`-labeled source images aren't actually pre-flame.** One hard example under
+  `start_fire` shows a fully burnt-out structure with firefighters on scene — visually an aftermath
+  shot, not "early onset" smoke. This is dataset-definition noise inherited from the source data's
+  own labeling, not a pure model failure, and it's worth knowing about if this dataset mapping is
+  reused elsewhere.
+- **A few `fire` hard examples are stylized illustrations, not photos** (e.g. a sepia painting of a
+  battle scene with fire in the background) — out-of-distribution for an ImageNet-pretrained
+  backbone, and a reminder that a handful of the source dataset's images aren't real photographs.
+
+Net takeaway: the models aren't confusing `fire` with `no_fire` (that boundary is close to solved,
+≥93% on the diagonal for all three) — the real difficulty, and the one worth spending future
+labeling/augmentation effort on, is teaching the models to treat *any* smoke signal, however faint
+or oddly lit, as a `start_fire` cue rather than defaulting to `no_fire` when flame isn't visible.
 
 ## Video demo
 
-<!-- VIDEO_SECTION -->
+`infer_video.py` was run with the winning ViT-Tiny checkpoint on a short public wildfire-response
+clip ([source](https://github.com/spacewalk01/yolov5-fire-detection), used here for demonstration
+only), re-running inference every 12 frames and holding the last prediction between samples:
+
+![Annotated demo](results/videos/annotated_preview.gif)
+
+*(Full-resolution output: `results/videos/annotated.mp4`.)*
+
+The clip itself is a good qualitative stress test of the exact `start_fire`/`fire` boundary the
+hard-example analysis flags: early in the clip, with the car mostly obscured by dense black smoke
+and only edges of flame visible, the model alternates between `start_fire` (correct-ish — smoke
+dominates the frame) and `no_fire` (wrong — a frame where the flame is partly visible but the smoke
+plume fills most of the frame). Once the camera closes in and the burning car fills the frame with
+clearly-visible flame and little smoke, the model locks onto `fire` at 99%+ confidence. In other
+words, the model is reliable when flame is large and unoccluded in-frame, and least reliable
+exactly when smoke dominates the frame composition — which is the same failure mode the static
+hard-example mining surfaced independently.
 
 ## Project structure
 
