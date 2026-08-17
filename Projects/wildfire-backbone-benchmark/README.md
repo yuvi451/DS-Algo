@@ -61,22 +61,46 @@ CPU-only training — no GPU was available in this build environment; see the no
 ViT-Tiny wins on every axis here: highest accuracy, best `start_fire` F1, *and* lowest latency —
 despite EfficientNet-B0 having fewer parameters, ViT-Tiny's patch-embedding forward pass is
 cheaper per-image on CPU than EfficientNet-B0's depthwise convs. ResNet50 is both the slowest and
-least accurate of the three, making it the clear loser of this comparison for this task. Latency
-numbers are CPU (no GPU in this build environment); relative ordering, not absolute ms, is what's
-transferable — on GPU all three would be faster in roughly the same rank order.
+least accurate of the three, making it the clear loser of this comparison for this task.
 
 ![Comparison](results/plots/comparison.png)
 ![Confusion matrices](results/plots/confusion_matrices.png)
+
+### Cross-hardware validation (Kaggle T4 GPU)
+
+The `notebooks/kaggle_runner.ipynb` notebook (same code, same dataset/split logic, run
+independently on a Kaggle T4 GPU) was actually run and reported back:
+
+| Model | Test Acc | F1 (start_fire) | Latency (ms, T4 GPU) | Params (M) | Hard Examples |
+|---|---|---|---|---|---|
+| ResNet50 | 0.927 | 0.899 | 6.27 | 23.5 | 59 |
+| EfficientNet-B0 | 0.929 | 0.894 | **8.65** | 4.0 | 32 |
+| **ViT-Tiny** | **0.938** | **0.910** | 4.91 | 5.5 | 29 |
+
+Two things this second, independent run confirms or corrects:
+
+- **The accuracy ranking holds.** ViT-Tiny wins on both accuracy and `start_fire` F1 on both CPU
+  and GPU, on two different runs with different random augmentation/shuffling — this isn't a
+  CPU-run fluke.
+- **The latency ranking does *not* hold, and an earlier version of this README was wrong to
+  predict it would.** On CPU, EfficientNet-B0 was solidly the middle option (28.7ms, between
+  ResNet50's 64.4ms and ViT-Tiny's 24.1ms). On GPU, **EfficientNet-B0 is the *slowest* of the
+  three** (8.65ms) despite having the fewest parameters by far (4.0M vs. 23.5M for ResNet50) —
+  its depthwise-separable convolutions are parameter-efficient but launch many small, poorly
+  GPU-parallelizable kernels, while ResNet50's larger, denser convolutions and ViT-Tiny's
+  matmul-heavy attention both map onto GPU hardware more efficiently. This is a real, useful
+  deployment finding on its own: parameter count is not a reliable proxy for GPU latency, and
+  which backbone is "fast" depends on the target hardware, not just model size.
+
+Full per-model metrics and plots from this run are in `results_gpu/`.
 
 ## Hard-example analysis
 
 `start_fire` is the weakest class for every single model (F1 0.85–0.92, vs. 0.91–0.96 for `fire`
 and `no_fire`) and produces the most hard examples in every run (26–64, vs. single digits to
-low-teens for the other two classes on the better models). The confusion matrices point at one
-specific, dominant failure mode: **`start_fire` mistaken for `no_fire`** — ResNet50 gets this
-wrong on 23/150 (15%) of true `start_fire` test images, EfficientNet-B0 on 9%, ViT-Tiny on 6%.
-This is exactly the ambiguity the project set out to measure, not a labeling artifact — pulling
-actual images from `results/hard_examples/*/start_fire/` confirms it:
+low-teens for the other two classes on the better models). This is exactly the ambiguity the
+project set out to measure, not a labeling artifact — pulling actual images from
+`results/hard_examples/*/start_fire/` confirms it:
 
 - **Faint or backgrounded smoke reads as `no_fire`.** A street scene with hazy exhaust/dust near a
   parked truck, and a shot of workers paving a road (heat shimmer + steam off hot asphalt), both
@@ -95,10 +119,26 @@ actual images from `results/hard_examples/*/start_fire/` confirms it:
   battle scene with fire in the background) — out-of-distribution for an ImageNet-pretrained
   backbone, and a reminder that a handful of the source dataset's images aren't real photographs.
 
-Net takeaway: the models aren't confusing `fire` with `no_fire` (that boundary is close to solved,
-≥93% on the diagonal for all three) — the real difficulty, and the one worth spending future
-labeling/augmentation effort on, is teaching the models to treat *any* smoke signal, however faint
-or oddly lit, as a `start_fire` cue rather than defaulting to `no_fire` when flame isn't visible.
+Where exactly `start_fire` errors land is **model-dependent, not a single uniform direction** —
+worth being precise about since an earlier draft of this README overstated it as "mostly confused
+with `no_fire`" across the board. Broken down by true-`start_fire` test images (n=150), CPU run:
+
+| Model | → `fire` | → `no_fire` | correct |
+|---|---|---|---|
+| ResNet50 | 5.3% | **15.3%** | 79.3% |
+| EfficientNet-B0 | **6.0%** | 2.7% | 91.3% |
+| ViT-Tiny | 4.7% | 4.0% | 91.3% |
+
+ResNet50 skews clearly toward `no_fire`; EfficientNet-B0 actually skews slightly the *other* way,
+toward `fire`; ViT-Tiny is roughly split evenly. The GPU re-run below reproduces the same
+qualitative pattern (ResNet50 fairly balanced 6%/5%, EfficientNet-B0 skewed hard toward `fire` at
+15%/1%, ViT-Tiny balanced 6%/6%) — the specific split shifts a little between runs (expected,
+given unseeded shuffling/augmentation), but EfficientNet-B0 leaning toward `fire`-confusion and
+ResNet50/ViT-Tiny being closer to balanced holds up in both. Net takeaway: the models aren't
+confusing `fire` with `no_fire` directly (that boundary is close to solved, ≥93% on the diagonal
+for all three, both runs) — the real difficulty is `start_fire` sitting ambiguously between the
+other two, in *both* directions depending on the model's specific decision boundary, which is
+consistent with the qualitative examples above (faint smoke → `no_fire`; warm-lit steam → `fire`).
 
 ## Video demo
 
@@ -135,13 +175,18 @@ wildfire-backbone-benchmark/
 ├── evaluate.py                   # metrics + confusion matrix + latency + hard-example mining
 ├── infer_video.py                # annotates an mp4 with the best model's predictions
 ├── compare_results.py            # aggregates all 3 models into one table/plot
-├── notebooks/colab_runner.ipynb  # orchestrates everything on Colab GPU
-├── results/
+├── notebooks/
+│   ├── colab_runner.ipynb        # orchestrates everything on Colab GPU
+│   └── kaggle_runner.ipynb       # self-contained Kaggle GPU version (writes its own copy of the code)
+├── results/                      # CPU run (this build environment)
 │   ├── checkpoints/               # .pt files per model (gitignored, regenerate via train.py)
 │   ├── metrics/                   # per-model JSON metrics + comparison.csv
 │   ├── hard_examples/             # misclassified images per model, per class (gitignored)
 │   ├── videos/                    # annotated demo video
 │   └── plots/                     # confusion matrices, comparison charts
+├── results_gpu/                  # Kaggle T4 GPU run (cross-hardware validation, see README above)
+│   ├── metrics/
+│   └── plots/
 └── detection/                     # stretch goal, not run in this build (no bbox dataset available)
     ├── prepare_dfire.py
     └── train_yolo.py
