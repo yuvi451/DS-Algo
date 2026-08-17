@@ -1,0 +1,22 @@
+data_dir: data/raw
+split_file: data/split.json
+class_names: [fire, no_fire, start_fire]
+
+backbones:
+  - resnet50
+  - efficientnet_b0
+  - vit_tiny_patch16_224
+
+train:
+  epochs: 6
+  batch_size: 32
+  lr: 0.001
+  freeze_backbone: true
+  seed: 42
+
+evaluate:
+  hard_example_conf_threshold: 0.5
+  latency_runs: 50
+
+video:
+  frame_sample_freq: 12

@@ -1,0 +1,56 @@
+{
+  "model": "efficientnet_b0",
+  "report": {
+    "fire": {
+      "precision": 0.9395973154362416,
+      "recall": 0.9333333333333333,
+      "f1-score": 0.9364548494983278,
+      "support": 150.0
+    },
+    "no_fire": {
+      "precision": 0.9724137931034482,
+      "recall": 0.94,
+      "f1-score": 0.9559322033898305,
+      "support": 150.0
+    },
+    "start_fire": {
+      "precision": 0.8782051282051282,
+      "recall": 0.9133333333333333,
+      "f1-score": 0.8954248366013072,
+      "support": 150.0
+    },
+    "accuracy": 0.9288888888888889,
+    "macro avg": {
+      "precision": 0.9300720789149394,
+      "recall": 0.9288888888888889,
+      "f1-score": 0.9292706298298219,
+      "support": 450.0
+    },
+    "weighted avg": {
+      "precision": 0.9300720789149393,
+      "recall": 0.9288888888888889,
+      "f1-score": 0.9292706298298218,
+      "support": 450.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      140,
+      0,
+      10
+    ],
+    [
+      0,
+      141,
+      9
+    ],
+    [
+      9,
+      4,
+      137
+    ]
+  ],
+  "latency_ms": 28.661317825317383,
+  "params": 4011391,
+  "n_hard_examples": 33
+}

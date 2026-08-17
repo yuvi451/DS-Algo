@@ -1,0 +1,9 @@
+data/raw/
+data/split.json
+results/checkpoints/*.pt
+results/hard_examples/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+yolov8n.pt
+detection/dfire_prepared/
