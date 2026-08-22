@@ -21,6 +21,8 @@ warnings.filterwarnings("ignore")
 import numpy as np
 import pandas as pd
 
+RF = 0.065          # risk-free rate used for financing and excess-return Sharpe
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "src"))
 
 import backtest
@@ -28,10 +30,12 @@ import baselines
 import data as data_mod
 import features
 import model as model_mod
+import signals
 import validation
 import volatility as vol
 
-pd.set_option("display.width", 120)
+pd.set_option("display.width", 200)
+pd.set_option("display.max_columns", 30)
 pd.set_option("display.float_format", lambda x: f"{x:,.4f}")
 
 
@@ -67,6 +71,7 @@ def main() -> None:
     ap.add_argument("--trials", type=int, default=20)
     ap.add_argument("--seed", type=int, default=23)
     ap.add_argument("--garch", action="store_true", help="also fit the GARCH baseline (slow)")
+    ap.add_argument("--no-short", action="store_true")
     args = ap.parse_args()
 
     prices, vix, is_synth = load(args)
@@ -148,6 +153,37 @@ def main() -> None:
     print("\nNote: a long-only position sized by a vol forecast has no expected-return")
     print("edge -- Sharpe is invariant to leverage. This leg is a risk overlay, and")
     print("the honest claim is the drawdown, not the return.")
+
+    # ------------------------------------------------------ long/short
+    _rule("BACKTEST 1b  --  LONG/SHORT, direction from signals + size from the vol model")
+    direction = signals.build_direction(table, allow_short=True)
+    print("Information coefficient vs next-day return (run this before trusting any curve):")
+    print(signals.signal_report(direction.reindex(preds.index),
+                                next_ret.reindex(preds.index)).round(4))
+
+    d = direction["direction"].reindex(preds.index)
+    ls = backtest.long_short_backtest(
+        d, pred_vol_v2, next_ret, target_ann_vol=0.12, max_long=1.5,
+        max_short=-1.0, cost_bps=5.0, deadband=0.10, stop_drawdown=-0.25)
+    lo = backtest.long_short_backtest(
+        signals.build_direction(table, allow_short=False)["direction"].reindex(preds.index),
+        pred_vol_v2, next_ret, target_ann_vol=0.12, max_long=1.5,
+        cost_bps=5.0, deadband=0.10, stop_drawdown=-0.25)
+
+    print()
+    print(pd.DataFrame([
+        backtest.summarize(v2["strategy_return"], RF, label="vol overlay, no direction"),
+        backtest.summarize(lo["strategy_return"], RF, label="directional, long-only"),
+        backtest.summarize(ls["strategy_return"], RF, label="directional, LONG/SHORT"),
+        backtest.summarize(ls["buy_hold_return"], RF, label="buy & hold (total return)"),
+    ]).set_index("label")[["cagr", "ann_vol", "sharpe", "sortino", "max_drawdown", "total_return"]])
+    print(f"\ndays short {100*ls['is_short'].mean():.0f}%   "
+          f"mean GROSS exposure {ls['gross_exposure'].mean():.2f}x   "
+          f"mean net {ls['position'].mean():+.2f}x")
+    print("Sharpe here is EXCESS of the 6.5% risk-free rate -- a book that sits in")
+    print("cash most of the time would otherwise post a flattering ratio on T-bills.")
+    print("Shorting fights the index's drift and gives up the dividend yield. If the")
+    print("IC table above is not significant, the long/short row is a draw from noise.")
 
     # ---------------------------------------------------------------- VRP
     _rule("BACKTEST 2  --  variance risk premium carry (the profitable leg)")
