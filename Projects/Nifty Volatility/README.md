@@ -35,10 +35,10 @@ src/baselines.py    naive, HAR-RV (Corsi 2009), GARCH(1,1) in matched units
 src/model.py        LightGBM + Optuna
 src/validation.py   walk-forward, purging, Diebold-Mariano
 src/signals.py      directional signals + information-coefficient test
-src/backtest.py     vol overlay, long/short (futures carry), VRP carry
+src/backtest.py     vol overlay, directional (futures carry), VRP carry
 src/explain.py      SHAP, and an ablation test with a p-value
 src/data.py         yfinance loaders + a synthetic market for offline runs
-tests/              27 tests; several pin the v1 bugs directly
+tests/              35 tests; several pin the v1 bugs directly
 run_pipeline.py     end-to-end: validation, all three backtests, the blend
 
 kaggle_nifty_volatility_v2.ipynb   <- run this on Kaggle, on real data
@@ -60,24 +60,54 @@ headlines are cached to `/kaggle/working/scored_news.parquet`, so re-runs skip
 the slow part. Results land in `results_summary.csv` and
 `walk_forward_predictions.csv`.
 
+### If yfinance fails
+
+It usually works on Kaggle, but Yahoo rate-limits datacenter IP ranges and
+Kaggle runners sit in those ranges — a run can return 429 or an empty frame on
+a day when the same call succeeds from a laptop. The loader tries three sources
+in order: **mounted CSV → yfinance → Stooq** (Stooq carries the Nifty index but
+not India VIX).
+
+The CSV route is the only one that cannot be throttled, so use it if the run
+matters: *Add Data* → search for a Nifty 50 and an India VIX dataset → set
+`NIFTY_CSV` / `VIX_CSV` in the config cell to the mounted paths. Column naming
+is handled tolerantly — Yahoo's `Adj Close`, NSE's `dd-mm-yyyy` dates and
+`"21,880.90"` thousands separators all parse.
+
+**India VIX is the dependency that matters.** Without it the VRP strategy — the
+only leg with a real expected-return edge — cannot run at all. The notebook
+detects this and skips that section rather than producing a silently empty one.
+
 ## The three strategies
 
 | | What it is | Honest expectation |
 |---|---|---|
 | **A. Volatility overlay** | Long-only index, sized inversely to predicted vol | Will **not** beat buy-and-hold on return. Sharpe is invariant to leverage. Claim the drawdown. |
-| **B. Long/short** | Direction from momentum + VRP + sentiment; size from the vol model | Only as good as the directional signal. Check the IC t-stat first — under 2 and the curve is noise. |
+| **B. Directional** | Side from momentum + VRP + sentiment; size from the vol model. **Long-only by default** | Only as good as the directional signal. Check the IC t-stat first — under 2 and the curve is noise. |
 | **C. VRP carry** | Sell variance when India VIX is rich vs the model's forecast | The only leg with a real expected-return edge. Negatively skewed; needs a crisis in the sample to be believed. |
 
-### On shorting
+### On shorting — off by default
 
-You cannot short the cash index in India — shorting means futures, so the carry
-differs: a short gives up the dividend yield and collects the risk-free rate on
+`ALLOW_SHORT = False` in the notebook, `--short` to enable in `run_pipeline.py`.
+
+The short leg rides entirely on the directional signals, whose realistic daily
+information coefficients are 0.02–0.05. The notebook prints an **IC table with
+a Newey-West t-stat before any equity curve**; if the blended signal's t-stat is
+below 2, shorting buys turnover, financing drag and tail risk in exchange for
+noise, and the default keeps it switched off.
+
+The code is kept rather than deleted because that call depends on data this
+repo has not been run against. One flag is not complexity; deleting it would
+mean you cannot check.
+
+If you do enable it: you cannot short the cash index in India, so shorting means
+futures. A short gives up the dividend yield and collects the risk-free rate on
 both its capital and the short proceeds, while fighting the index's positive
-drift. `futures_carry` models this. A short book also gets a drawdown stop,
-because losses on a short are unbounded.
+drift — `futures_carry` models this, and it is a structural headwind. A short
+book also gets a drawdown stop, because losses on a short are unbounded.
 
-Sharpe and Sortino for these are reported **in excess of the risk-free rate**. A
-long/short book sits in cash much of the time, and without that subtraction a
+Sharpe and Sortino are reported **in excess of the risk-free rate**. A
+directional book sits in cash much of the time, and without that subtraction a
 strategy that is mostly T-bills posts a spectacular-looking ratio.
 
 ## Running it
@@ -85,10 +115,11 @@ strategy that is mostly T-bills posts a spectacular-looking ratio.
 ```bash
 pip install yfinance lightgbm optuna shap arch scikit-learn pandas numpy pytest
 
-python -m pytest tests/ -q          # 27 tests, no network needed
+python -m pytest tests/ -q          # 35 tests, no network needed
 python run_pipeline.py              # live data; falls back to synthetic
 python run_pipeline.py --synthetic  # force the offline market
 python run_pipeline.py --garch      # add the GARCH baseline (slow)
+python run_pipeline.py --short      # enable the short leg
 ```
 
 `run_pipeline.py` prints forecast error against HAR-RV with a Diebold-Mariano

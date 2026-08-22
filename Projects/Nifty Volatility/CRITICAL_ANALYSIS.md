@@ -296,6 +296,12 @@ position off the capped worst case rather than off volatility.
 Shorting was requested, so it is in. Two things have to be said plainly about
 it.
 
+**Shorting is off by default.** `ALLOW_SHORT = False`; the IC test below is the
+gate that decides whether to turn it on. The code is kept rather than deleted
+because whether it earns its place depends on data this analysis has not been
+run against, and deleting it would remove the ability to check. One flag is not
+complexity.
+
 **A volatility model cannot tell you which way to bet.** It forecasts `|r|`;
 the sign is precisely the information it discards. "Add shorting" is therefore
 really "add a return forecast", and that is a much harder problem. Realized
@@ -358,8 +364,8 @@ is.
 | `src/backtest.py` | Corrected units, financing charged, no-trade band with partial adjustment, vol-matched comparison; and `vrp_backtest`, the strategy from section 5. |
 | `src/signals.py` | Directional signals (momentum, VRP, sentiment polarity) and an information-coefficient test. Prerequisite for shorting -- see section 5b. |
 | `src/explain.py` | `incremental_value` — ablation with a p-value, replacing the SHAP-share argument. |
-| `src/data.py` | Loaders, plus a synthetic market for offline testing. |
-| `tests/test_pipeline.py` | 27 tests. Several pin the v1 bugs directly. |
+| `src/data.py` | Multi-source loaders (mounted CSV -> yfinance -> Stooq, since Yahoo rate-limits datacenter IPs), plus a synthetic market for offline testing. |
+| `tests/test_pipeline.py` | 35 tests. Several pin the v1 bugs directly. |
 
 ### Expected effect of each fix on the backtest
 
@@ -384,7 +390,7 @@ written in blocks Yahoo Finance at the network policy level, so `^NSEI` and
 
 - Section 1 is arithmetic on the reported numbers, and the 1.35x-predicted vs
   1.31x-observed agreement is genuine evidence. That part stands on its own.
-- The code is verified by a 27-test suite and an end-to-end run against a
+- The code is verified by a 35-test suite and an end-to-end run against a
   synthetic market (`run_pipeline.py --synthetic`), which confirms the pipeline
   is correct and reproduces the v1 over-leverage mechanism (1.39x average
   position, 3.65%/yr cost drag against v2's 0.89x and 0.87%/yr).

@@ -363,3 +363,111 @@ def test_long_short_reduces_to_long_only_when_direction_is_one(market):
                                       deadband=0.10)
     pd.testing.assert_series_equal(ls["position"], lo["position"],
                                    check_names=False, rtol=1e-9)
+
+
+# --------------------------------------------------------------------------
+# data sourcing (the CSV fallback that makes a Kaggle run reproducible)
+# --------------------------------------------------------------------------
+
+def _write(tmp_path, name, text):
+    f = tmp_path / name
+    f.write_text(text.strip() + "\n")
+    return f
+
+
+def test_load_ohlc_csv_yahoo_format(tmp_path):
+    f = _write(tmp_path, "y.csv", """
+Date,Open,High,Low,Close,Adj Close,Volume
+2024-01-01,21700.5,21800.1,21650.0,21750.3,21750.3,250000
+2024-01-02,21760.0,21900.4,21740.2,21880.9,21880.9,310000
+""")
+    df = data.load_ohlc_csv(f)
+    assert list(df.columns) == ["open", "high", "low", "close", "volume"]
+    assert df.index[0] == pd.Timestamp("2024-01-01")
+    assert df["close"].iloc[1] == 21880.9
+
+
+def test_load_ohlc_csv_nse_format_with_commas_and_dayfirst(tmp_path):
+    """NSE exports use dd-mm-yyyy and thousands separators."""
+    f = _write(tmp_path, "nse.csv", """
+Date,Open,High,Low,Close,Shares Traded
+02-01-2024,"21,760.00","21,900.40","21,740.20","21,880.90","3,10,000"
+03-01-2024,"21,890.00","21,950.00","21,700.00","21,720.55","2,90,000"
+""")
+    df = data.load_ohlc_csv(f)
+    assert df.index[0] == pd.Timestamp("2024-01-02")
+    assert df["close"].iloc[0] == 21880.90
+    assert df["high"].iloc[1] == 21950.00
+
+
+def test_load_vix_csv_from_ohlc_and_from_single_series(tmp_path):
+    ohlc = _write(tmp_path, "vix_ohlc.csv", """
+Date,Open,High,Low,Close
+2024-01-01,14.2,15.1,14.0,14.8
+2024-01-02,14.9,16.3,14.7,15.9
+""")
+    series = _write(tmp_path, "vix_series.csv", """
+Date,India VIX
+2024-01-01,14.8
+2024-01-02,15.9
+""")
+    a = data.load_vix_csv(ohlc)
+    b = data.load_vix_csv(series)
+    assert a.name == "vix" and b.name == "vix"
+    assert list(a.round(2)) == list(b.round(2)) == [14.8, 15.9]
+
+
+def test_load_ohlc_csv_rejects_a_file_with_no_date(tmp_path):
+    f = _write(tmp_path, "bad.csv", "Open,High,Low,Close\n1,2,0.5,1.5")
+    with pytest.raises(ValueError, match="date"):
+        data.load_ohlc_csv(f)
+
+
+def test_load_market_data_prefers_csv_and_never_touches_the_network(tmp_path, monkeypatch):
+    """A mounted Kaggle dataset must short-circuit the network entirely."""
+    def explode(*a, **k):
+        raise AssertionError("network was called despite a CSV being supplied")
+
+    monkeypatch.setattr(data, "_from_yfinance", explode)
+    monkeypatch.setattr(data, "_from_stooq", explode)
+
+    px = _write(tmp_path, "p.csv", """
+Date,Open,High,Low,Close,Volume
+2024-01-01,100,102,99,101,10
+2024-01-02,101,103,100,102,11
+""")
+    vx = _write(tmp_path, "v.csv", "Date,Close\n2024-01-01,14.8\n2024-01-02,15.9")
+
+    prices, vix, prov = data.load_market_data(price_csv=px, vix_csv=vx, verbose=False)
+    assert len(prices) == 2 and len(vix) == 2
+    assert prov["prices"].startswith("csv:") and prov["vix"].startswith("csv:")
+
+
+def test_load_market_data_reports_missing_vix_rather_than_faking_it(tmp_path, monkeypatch):
+    """No implied vol must be an explicit None, not a silently empty column."""
+    monkeypatch.setattr(data, "_from_yfinance", lambda *a, **k: None)
+    monkeypatch.setattr(data, "_from_stooq", lambda *a, **k: None)
+
+    px = _write(tmp_path, "p.csv", """
+Date,Open,High,Low,Close,Volume
+2024-01-01,100,102,99,101,10
+""")
+    prices, vix, prov = data.load_market_data(price_csv=px, verbose=False)
+    assert vix is None
+    assert prov["vix"] == "UNAVAILABLE"
+
+
+def test_load_market_data_raises_a_useful_error_when_everything_fails(monkeypatch):
+    monkeypatch.setattr(data, "_from_yfinance", lambda *a, **k: None)
+    monkeypatch.setattr(data, "_from_stooq", lambda *a, **k: None)
+    with pytest.raises(RuntimeError, match="Internet"):
+        data.load_market_data(verbose=False)
+
+
+def test_pipeline_runs_without_any_vix(market):
+    """Losing India VIX must degrade the VIX features, not break the run."""
+    prices, _ = market
+    table = features.build_feature_table(prices, None, None, horizons=(1,))
+    cols = features.feature_columns(table)
+    assert len(cols) > 5
+    assert not any(c.startswith(("log_iv", "log_vrp", "vix_")) for c in cols)
