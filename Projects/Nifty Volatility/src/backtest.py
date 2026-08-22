@@ -57,13 +57,18 @@ def summarize(returns: pd.Series, rf_annual: float = 0.0,
     equity = (1 + r).cumprod()
     years = len(r) / TRADING_DAYS
     cagr = float(equity.iloc[-1] ** (1 / years) - 1) if years > 0 and len(equity) else 0.0
-    downside = r[r < 0].std()
+
+    # Sortino must use the same excess return as Sharpe. Comparing an
+    # excess-return Sharpe against a raw-return Sortino produces contradictory
+    # signs on the same series and makes a cash-heavy book look good.
+    excess = r - rf_annual / TRADING_DAYS
+    downside = excess[excess < 0].std()
     return {
         "label": label,
         "cagr": cagr,
         "ann_vol": float(r.std() * np.sqrt(TRADING_DAYS)),
         "sharpe": sharpe(r, rf_annual),
-        "sortino": float(np.sqrt(TRADING_DAYS) * r.mean() / downside) if downside else 0.0,
+        "sortino": float(np.sqrt(TRADING_DAYS) * excess.mean() / downside) if downside else 0.0,
         "max_drawdown": max_drawdown(equity),
         "total_return": float(equity.iloc[-1] - 1) if len(equity) else 0.0,
         "skew": float(r.skew()),
@@ -149,6 +154,149 @@ def vol_target_backtest(pred_vol: pd.Series, next_return: pd.Series,
     out["strategy_equity"] = (1 + out["strategy_return"]).cumprod()
     out["buy_hold_equity"] = (1 + out["buy_hold_return"]).cumprod()
     return out
+
+
+def futures_carry(position: pd.Series, rf_annual: float = 0.065,
+                  div_yield: float = 0.012) -> pd.Series:
+    """Daily carry for a fully-collateralised Nifty futures position.
+
+    You cannot short the cash index in India; shorting means futures. That
+    changes the financing arithmetic and it is worth getting right rather than
+    bolting a minus sign onto the long-only version.
+
+    A futures price is ``F = S * exp((r - q) * T)``, so holding the future to
+    expiry earns the *price* return minus ``(r - q)``. Meanwhile the cash that
+    is not posted as margin earns ``r``. Netting the two:
+
+        carry = position * q / 252  +  (1 - position) * r / 252
+
+    Read off the cases: at ``position = 1`` you earn the dividend yield on top
+    of the price return, which correctly reconstructs the total return of the
+    index (``^NSEI`` is a price index and excludes dividends). At
+    ``position = 0`` you earn the risk-free rate on all of it. At
+    ``position = -1`` you pay the dividend yield away on the short and collect
+    ``r`` on both your own capital and the short proceeds.
+
+    That last line is the one that matters for shorting: the carry is a
+    *headwind*, because you are giving up the dividend yield and fighting the
+    index's positive drift. A short has to overcome roughly ``q + drift``
+    before it breaks even, which is why the long/short version below usually
+    looks worse than long-only unless the directional signal is genuinely good.
+    """
+    return position * (div_yield / TRADING_DAYS) + (1 - position) * (rf_annual / TRADING_DAYS)
+
+
+def long_short_backtest(direction: pd.Series, pred_vol: pd.Series,
+                        next_return: pd.Series,
+                        target_ann_vol: float = 0.12,
+                        max_long: float = 1.5, max_short: float = -1.0,
+                        cost_bps: float = 5.0,
+                        rf_annual: float = 0.065, div_yield: float = 0.012,
+                        deadband: float = 0.10,
+                        stop_drawdown: float | None = -0.25) -> pd.DataFrame:
+    """Long/short index exposure: direction from signals, size from the vol model.
+
+    ``position = direction * (target_vol / predicted_vol)``, so the two models
+    do separate jobs -- the directional signal picks the side, the volatility
+    forecast decides how much risk that side is worth. This is the only
+    arrangement in which a volatility forecast contributes to *return* rather
+    than only to risk, and it does so indirectly: it makes each unit of
+    directional conviction carry constant risk.
+
+    ``cost_bps`` defaults to 5 rather than the 7.5 used for the cash overlay:
+    Nifty futures are cheaper to trade (STT on the sell side is 2 bps, spread
+    and brokerage roughly another 1-3).
+
+    ``stop_drawdown`` flattens the book if equity falls that far below its high
+    water mark, re-entering when the signal next flips. A short book without a
+    stop is how accounts get closed; losses on a short are unbounded and margin
+    calls arrive at the worst possible moment.
+    """
+    idx = (direction.index.intersection(pred_vol.index)
+           .intersection(next_return.index))
+    d = direction.loc[idx].astype(float)
+    pv = pred_vol.loc[idx].astype(float)
+    ret = next_return.loc[idx].astype(float)
+
+    target_daily = target_ann_vol / np.sqrt(TRADING_DAYS)
+    scalar = (target_daily / pv.replace(0, np.nan)).clip(0.0, abs(max_long))
+    raw = (d * scalar).clip(max_short, max_long)
+    pos = _apply_deadband(raw.ffill().fillna(0.0), deadband)
+
+    if stop_drawdown is not None:
+        pos = _apply_drawdown_stop(pos, ret, stop_drawdown, rf_annual, div_yield,
+                                   cost_bps)
+
+    traded = pos.diff().abs().fillna(pos.abs())
+    cost = traded * (cost_bps / 1e4)
+    carry = futures_carry(pos, rf_annual, div_yield)
+
+    strat = pos * ret + carry - cost
+
+    out = pd.DataFrame({
+        "direction": d,
+        "vol_scalar": scalar,
+        "position": pos,
+        "next_return": ret,
+        "carry": carry,
+        "cost": cost,
+        "strategy_return": strat,
+        "buy_hold_return": ret + div_yield / TRADING_DAYS,
+    })
+    out["strategy_equity"] = (1 + out["strategy_return"]).cumprod()
+    out["buy_hold_equity"] = (1 + out["buy_hold_return"]).cumprod()
+    out["gross_exposure"] = pos.abs()
+    out["is_short"] = (pos < 0).astype(int)
+    return out
+
+
+def _apply_drawdown_stop(pos: pd.Series, ret: pd.Series, limit: float,
+                         rf_annual: float, div_yield: float,
+                         cost_bps: float) -> pd.Series:
+    """Flatten the book while equity is more than ``limit`` below its peak.
+
+    Walked forward one day at a time because the stop depends on the equity
+    curve the stop itself produces -- deriving it from the unstopped curve
+    would be a lookahead.
+
+    Re-entry is deliberately conservative: once halted, the book stays flat
+    until the target position changes sign relative to what was held when the
+    stop fired. Re-entering on the same side that just lost 25% is how a stop
+    becomes a formality.
+    """
+    out = np.zeros(len(pos))
+    p = pos.to_numpy()
+    r = np.nan_to_num(ret.to_numpy())
+
+    equity, peak = 1.0, 1.0
+    halted = False
+    halted_side = 0.0
+    prev = 0.0
+
+    for i in range(len(p)):
+        want = p[i]
+        if halted:
+            # only wake up when the signal has flipped to the other side
+            if halted_side != 0.0 and np.sign(want) == -np.sign(halted_side):
+                halted = False
+            else:
+                want = 0.0
+
+        traded = abs(want - prev)
+        carry = (want * (div_yield / TRADING_DAYS)
+                 + (1 - want) * (rf_annual / TRADING_DAYS))
+        day = want * r[i] + carry - traded * (cost_bps / 1e4)
+
+        equity *= (1 + day)
+        peak = max(peak, equity)
+        out[i] = want
+        prev = want
+
+        if not halted and equity / peak - 1.0 <= limit:
+            halted = True
+            halted_side = np.sign(want) if want != 0 else np.sign(p[i])
+
+    return pd.Series(out, index=pos.index)
 
 
 def vol_matched(returns: pd.Series, benchmark: pd.Series) -> pd.Series:

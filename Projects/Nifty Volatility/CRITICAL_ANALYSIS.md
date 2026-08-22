@@ -291,6 +291,61 @@ position off the capped worst case rather than off volatility.
 
 ---
 
+## 5b. Adding shorting
+
+Shorting was requested, so it is in. Two things have to be said plainly about
+it.
+
+**A volatility model cannot tell you which way to bet.** It forecasts `|r|`;
+the sign is precisely the information it discards. "Add shorting" is therefore
+really "add a return forecast", and that is a much harder problem. Realized
+volatility is strongly autocorrelated and genuinely forecastable; daily index
+returns are close to a martingale. `src/signals.py` adds three cheap, causal
+directional signals — time-series momentum, the variance risk premium as a
+risk-appetite proxy, and signed news polarity (which is finally being asked the
+question its sign is about). Their documented out-of-sample information
+coefficients sit in the 0.02–0.05 range at daily horizon. Small, not zero, and
+that is the honest ceiling.
+
+**So check the IC before looking at the equity curve.**
+`signals.information_coefficient` reports rank correlation against next-day
+returns with a Newey-West t-stat. If the blend's t-stat is below 2, the
+long/short backtest is a draw from noise regardless of how good its Sharpe
+looks. On the synthetic market — which has no directional predictability built
+into it — the report correctly returns "NOT distinguishable from noise" for
+every component, which is the behaviour you want from the check.
+
+Three implementation details that are easy to get wrong:
+
+- **You cannot short the cash index in India; shorting means futures**, and the
+  carry arithmetic differs. `futures_carry` uses
+  `position * q / 252 + (1 - position) * r / 252`, which reads correctly in all
+  three cases: long earns the dividend yield on top of the price return
+  (reconstructing total return, since `^NSEI` is a price index), flat earns the
+  risk-free rate, and short pays the dividend away while collecting `r` on both
+  its own capital and the short proceeds. The short side is a structural
+  headwind — it must overcome roughly `q + drift` before breaking even.
+- **A short book needs a stop.** Losses on a short are unbounded and margin
+  calls arrive at the worst moment. `stop_drawdown` flattens the book at a
+  configurable drawdown from the high water mark and only re-enters when the
+  signal flips to the other side. It is walked forward one day at a time,
+  because the stop depends on the equity curve the stop itself produces.
+- **Report Sharpe in excess of the risk-free rate.** A long/short book sits in
+  cash a large fraction of the time. Without subtracting `r`, a strategy that is
+  90% T-bills posts a spectacular ratio on money-market returns. The same
+  applies to Sortino, which must use the same excess series — reporting an
+  excess-return Sharpe next to a raw-return Sortino produces contradictory signs
+  on one return stream.
+
+The division of labour is worth stating, because it is the only arrangement in
+which the volatility forecast contributes to *return* rather than only to risk:
+the directional signal picks the side, and the volatility model decides how much
+that side is worth, so each unit of conviction carries constant risk. That is an
+indirect contribution, and it is still bounded by how good the direction signal
+is.
+
+---
+
 ## 6. What changed
 
 | File | Purpose |
@@ -301,9 +356,10 @@ position off the capped worst case rather than off volatility.
 | `src/model.py` | Carries the early-stopped tree count into the refit — v1 tuned with early stopping and then refit with the raw suggested `n_estimators`, so the tuned config and the deployed model were different models. |
 | `src/validation.py` | Diebold-Mariano with Newey-West SEs; purging of overlapping multi-day targets at the train/test boundary; per-fold smearing from validation residuals. |
 | `src/backtest.py` | Corrected units, financing charged, no-trade band with partial adjustment, vol-matched comparison; and `vrp_backtest`, the strategy from section 5. |
+| `src/signals.py` | Directional signals (momentum, VRP, sentiment polarity) and an information-coefficient test. Prerequisite for shorting -- see section 5b. |
 | `src/explain.py` | `incremental_value` — ablation with a p-value, replacing the SHAP-share argument. |
 | `src/data.py` | Loaders, plus a synthetic market for offline testing. |
-| `tests/test_pipeline.py` | 19 tests. Several pin the v1 bugs directly. |
+| `tests/test_pipeline.py` | 27 tests. Several pin the v1 bugs directly. |
 
 ### Expected effect of each fix on the backtest
 
@@ -316,6 +372,7 @@ position off the capped worst case rather than off volatility.
 | HAR-RV baseline + DM test | headline margin drops from +15% to something defensible |
 | India VIX features | the largest expected RMSE improvement of anything here |
 | VRP strategy | the only component with an actual expected-return edge |
+| Long/short direction | bounded by an IC of ~0.02-0.05; check the t-stat before believing the curve |
 
 ---
 
@@ -327,7 +384,7 @@ written in blocks Yahoo Finance at the network policy level, so `^NSEI` and
 
 - Section 1 is arithmetic on the reported numbers, and the 1.35x-predicted vs
   1.31x-observed agreement is genuine evidence. That part stands on its own.
-- The code is verified by a 19-test suite and an end-to-end run against a
+- The code is verified by a 27-test suite and an end-to-end run against a
   synthetic market (`run_pipeline.py --synthetic`), which confirms the pipeline
   is correct and reproduces the v1 over-leverage mechanism (1.39x average
   position, 3.65%/yr cost drag against v2's 0.89x and 0.87%/yr).

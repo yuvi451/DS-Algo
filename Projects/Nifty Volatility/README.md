@@ -34,19 +34,58 @@ src/features.py     price/HAR + India VIX + volatility-relevant sentiment
 src/baselines.py    naive, HAR-RV (Corsi 2009), GARCH(1,1) in matched units
 src/model.py        LightGBM + Optuna
 src/validation.py   walk-forward, purging, Diebold-Mariano
-src/backtest.py     vol-target overlay (repaired) + VRP carry (the edge)
+src/signals.py      directional signals + information-coefficient test
+src/backtest.py     vol overlay, long/short (futures carry), VRP carry
 src/explain.py      SHAP, and an ablation test with a p-value
 src/data.py         yfinance loaders + a synthetic market for offline runs
-tests/              19 tests; several pin the v1 bugs directly
-run_pipeline.py     end-to-end: validation, both backtests, the blend
+tests/              27 tests; several pin the v1 bugs directly
+run_pipeline.py     end-to-end: validation, all three backtests, the blend
+
+kaggle_nifty_volatility_v2.ipynb   <- run this on Kaggle, on real data
+nifty_volatility_v2.ipynb          same pipeline, Colab-oriented
+build_kaggle_notebook.py           regenerates the Kaggle notebook from src/
 ```
+
+## Training on real data (Kaggle)
+
+Upload `kaggle_nifty_volatility_v2.ipynb`, then in the right-hand panel:
+
+1. **Settings → Internet → On** (needed for yfinance, GDELT, HuggingFace;
+   Kaggle asks for phone verification).
+2. **Settings → Accelerator → GPU T4 x2** — only for the FinBERT step. Set
+   `RUN_NEWS = False` in the config cell to skip it and run on CPU.
+
+Runtime is ~5 minutes without news, 25–40 with the full GDELT backfill. Scored
+headlines are cached to `/kaggle/working/scored_news.parquet`, so re-runs skip
+the slow part. Results land in `results_summary.csv` and
+`walk_forward_predictions.csv`.
+
+## The three strategies
+
+| | What it is | Honest expectation |
+|---|---|---|
+| **A. Volatility overlay** | Long-only index, sized inversely to predicted vol | Will **not** beat buy-and-hold on return. Sharpe is invariant to leverage. Claim the drawdown. |
+| **B. Long/short** | Direction from momentum + VRP + sentiment; size from the vol model | Only as good as the directional signal. Check the IC t-stat first — under 2 and the curve is noise. |
+| **C. VRP carry** | Sell variance when India VIX is rich vs the model's forecast | The only leg with a real expected-return edge. Negatively skewed; needs a crisis in the sample to be believed. |
+
+### On shorting
+
+You cannot short the cash index in India — shorting means futures, so the carry
+differs: a short gives up the dividend yield and collects the risk-free rate on
+both its capital and the short proceeds, while fighting the index's positive
+drift. `futures_carry` models this. A short book also gets a drawdown stop,
+because losses on a short are unbounded.
+
+Sharpe and Sortino for these are reported **in excess of the risk-free rate**. A
+long/short book sits in cash much of the time, and without that subtraction a
+strategy that is mostly T-bills posts a spectacular-looking ratio.
 
 ## Running it
 
 ```bash
 pip install yfinance lightgbm optuna shap arch scikit-learn pandas numpy pytest
 
-python -m pytest tests/ -q          # 19 tests, no network needed
+python -m pytest tests/ -q          # 27 tests, no network needed
 python run_pipeline.py              # live data; falls back to synthetic
 python run_pipeline.py --synthetic  # force the offline market
 python run_pipeline.py --garch      # add the GARCH baseline (slow)
@@ -81,6 +120,7 @@ Claimable, once you have run it on real data:
   comparable return, with financing charged and turnover controlled;
 - the VRP strategy against **both** the untimed short-variance benchmark and a
   trailing-realized-vol-timed one;
+- the long/short book **only if** its information coefficient is significant;
 - sentiment's contribution as an ablation result with a p-value, whichever way
   it comes out.
 
@@ -89,7 +129,8 @@ Not claimable:
 - any Sharpe from `--synthetic`, and the VRP one especially — the simulator's
   premium is trivially timeable and the output says so;
 - that vol targeting beats buy-and-hold on return;
-- a short-variance Sharpe from a sample with no volatility crisis in it.
+- a short-variance Sharpe from a sample with no volatility crisis in it;
+- a long/short result whose underlying signal has a t-stat below 2.
 
 ## Status
 

@@ -261,3 +261,105 @@ def test_walk_forward_folds_never_overlap(market):
     for train_mask, test_mask in validation.generate_folds(idx, train_years=2):
         assert not (train_mask & test_mask).any()
         assert idx[train_mask].max() < idx[test_mask].min()
+
+
+# --------------------------------------------------------------------------
+# directional signals and shorting
+# --------------------------------------------------------------------------
+
+import signals  # noqa: E402
+
+
+def test_signals_are_causal(market):
+    """A signal at t must not change when future data is appended."""
+    prices, vix = market
+    full = features.build_feature_table(prices, None, vix)
+    cut = 900
+    trunc = features.build_feature_table(prices.iloc[:cut], None, vix.iloc[:cut])
+    a = signals.build_direction(full).iloc[cut - 1]
+    b = signals.build_direction(trunc).iloc[cut - 1]
+    pd.testing.assert_series_equal(a, b, check_names=False, rtol=1e-9)
+
+
+def test_direction_is_bounded(market):
+    prices, vix = market
+    table = features.build_feature_table(prices, None, vix)
+    d = signals.build_direction(table)["direction"]
+    assert d.between(-1.0, 1.0).all()
+    assert d.notna().all()
+
+
+def test_allow_short_false_never_goes_negative(market):
+    prices, vix = market
+    table = features.build_feature_table(prices, None, vix)
+    d = signals.build_direction(table, allow_short=False)["direction"]
+    assert (d >= 0).all()
+    assert signals.build_direction(table, allow_short=True)["direction"].min() < 0
+
+
+def test_information_coefficient_detects_a_planted_signal():
+    rng = np.random.default_rng(4)
+    n = 2000
+    idx = pd.bdate_range("2015-01-01", periods=n)
+    sig = pd.Series(rng.standard_normal(n), index=idx)
+    ret = pd.Series(0.20 * sig.to_numpy() + rng.standard_normal(n), index=idx)
+    good = signals.information_coefficient(sig, ret)
+    noise = signals.information_coefficient(
+        pd.Series(rng.standard_normal(n), index=idx), ret)
+    assert good["ic"] > 0 and good["p_value"] < 0.05
+    assert noise["p_value"] > 0.05
+
+
+def test_futures_carry_cases():
+    """Long earns the dividend yield; flat earns the risk-free rate; short pays."""
+    rf, q = 0.065, 0.012
+    pos = pd.Series([1.0, 0.0, -1.0])
+    c = backtest.futures_carry(pos, rf, q)
+    assert abs(c.iloc[0] - q / 252) < 1e-12          # long: price return + q
+    assert abs(c.iloc[1] - rf / 252) < 1e-12         # flat: earns cash
+    assert abs(c.iloc[2] - (-q + 2 * rf) / 252) < 1e-12   # short: pays q, earns rf twice
+
+
+def test_short_positions_actually_occur_and_profit_when_market_falls():
+    idx = pd.bdate_range("2020-01-01", periods=400)
+    down = pd.Series(-0.003, index=idx)               # steady decline
+    pv = pd.Series(0.01, index=idx)
+    short = pd.Series(-1.0, index=idx)
+    bt = backtest.long_short_backtest(short, pv, down, deadband=0.0,
+                                      stop_drawdown=None, max_short=-1.0)
+    assert (bt["position"] < 0).all()
+    assert bt["strategy_return"].mean() > 0            # short profits as it falls
+    assert bt["buy_hold_return"].mean() < 0
+
+
+def test_drawdown_stop_bounds_the_loss():
+    idx = pd.bdate_range("2020-01-01", periods=400)
+    ret = pd.Series(-0.004, index=idx)
+    pv = pd.Series(0.01, index=idx)
+    always_long = pd.Series(1.0, index=idx)
+
+    stopped = backtest.long_short_backtest(always_long, pv, ret, deadband=0.0,
+                                           stop_drawdown=-0.20)
+    unstopped = backtest.long_short_backtest(always_long, pv, ret, deadband=0.0,
+                                             stop_drawdown=None)
+    assert backtest.max_drawdown(stopped["strategy_equity"]) > -0.30
+    assert (backtest.max_drawdown(stopped["strategy_equity"])
+            > backtest.max_drawdown(unstopped["strategy_equity"]))
+
+
+def test_long_short_reduces_to_long_only_when_direction_is_one(market):
+    """Sanity: direction == 1 everywhere should track the long-only overlay."""
+    prices, vix = market
+    table = features.build_feature_table(prices, None, vix)
+    pv = table["rv"].dropna()
+    ret = table["log_return"].shift(-1).reindex(pv.index)
+    ones = pd.Series(1.0, index=pv.index)
+
+    ls = backtest.long_short_backtest(ones, pv, ret, target_ann_vol=0.12,
+                                      max_long=1.5, cost_bps=7.5, div_yield=0.0,
+                                      stop_drawdown=None, deadband=0.10)
+    lo = backtest.vol_target_backtest(pv, ret, target_ann_vol=0.12,
+                                      max_leverage=1.5, cost_bps=7.5,
+                                      deadband=0.10)
+    pd.testing.assert_series_equal(ls["position"], lo["position"],
+                                   check_names=False, rtol=1e-9)
