@@ -71,7 +71,8 @@ def main() -> None:
     ap.add_argument("--trials", type=int, default=20)
     ap.add_argument("--seed", type=int, default=23)
     ap.add_argument("--garch", action="store_true", help="also fit the GARCH baseline (slow)")
-    ap.add_argument("--no-short", action="store_true")
+    ap.add_argument("--short", action="store_true",
+                    help="enable the short leg (off by default; check the IC first)")
     args = ap.parse_args()
 
     prices, vix, is_synth = load(args)
@@ -155,35 +156,51 @@ def main() -> None:
     print("the honest claim is the drawdown, not the return.")
 
     # ------------------------------------------------------ long/short
-    _rule("BACKTEST 1b  --  LONG/SHORT, direction from signals + size from the vol model")
+    _rule("BACKTEST 1b  --  DIRECTIONAL: side from signals, size from the vol model")
     direction = signals.build_direction(table, allow_short=True)
-    print("Information coefficient vs next-day return (run this before trusting any curve):")
-    print(signals.signal_report(direction.reindex(preds.index),
-                                next_ret.reindex(preds.index)).round(4))
+    d_raw = direction["direction"].reindex(preds.index)
+    nr = next_ret.reindex(preds.index)
 
-    d = direction["direction"].reindex(preds.index)
-    ls = backtest.long_short_backtest(
-        d, pred_vol_v2, next_ret, target_ann_vol=0.12, max_long=1.5,
-        max_short=-1.0, cost_bps=5.0, deadband=0.10, stop_drawdown=-0.25)
+    print("Information coefficient vs next-day return "
+          "(read this before any equity curve):")
+    print(signals.signal_report(direction.reindex(preds.index), nr).round(4))
+
+    d_lo = signals.build_direction(table, allow_short=False)["direction"].reindex(preds.index)
     lo = backtest.long_short_backtest(
-        signals.build_direction(table, allow_short=False)["direction"].reindex(preds.index),
-        pred_vol_v2, next_ret, target_ann_vol=0.12, max_long=1.5,
-        cost_bps=5.0, deadband=0.10, stop_drawdown=-0.25)
+        d_lo, pred_vol_v2, next_ret, target_ann_vol=0.12, max_long=1.5,
+        cost_bps=5.0, rf_annual=RF, deadband=0.10, stop_drawdown=-0.25)
 
-    print()
-    print(pd.DataFrame([
-        backtest.summarize(v2["strategy_return"], RF, label="vol overlay, no direction"),
+    rows = [
+        backtest.summarize(v2["strategy_return"], RF, label="overlay, no direction"),
         backtest.summarize(lo["strategy_return"], RF, label="directional, long-only"),
-        backtest.summarize(ls["strategy_return"], RF, label="directional, LONG/SHORT"),
-        backtest.summarize(ls["buy_hold_return"], RF, label="buy & hold (total return)"),
-    ]).set_index("label")[["cagr", "ann_vol", "sharpe", "sortino", "max_drawdown", "total_return"]])
+    ]
+
+    ic = signals.information_coefficient(d_raw, nr)
+    if args.short:
+        ls = backtest.long_short_backtest(
+            d_raw, pred_vol_v2, next_ret, target_ann_vol=0.12, max_long=1.5,
+            max_short=-1.0, cost_bps=5.0, rf_annual=RF, deadband=0.10,
+            stop_drawdown=-0.25)
+        rows.append(backtest.summarize(ls["strategy_return"], RF,
+                                       label="directional, LONG/SHORT"))
+    else:
+        ls = lo
+        print(f"\nShorting off (pass --short to enable). Blended-signal IC t-stat "
+              f"{ic['t_stat']:+.2f} (p={ic['p_value']:.3f}).")
+        print("Above 2 means the direction signal is real and the short leg is worth")
+        print("switching on. Below it, shorting buys turnover, financing drag and")
+        print("tail risk in exchange for noise.")
+
+    rows.append(backtest.summarize(lo["buy_hold_return"], RF,
+                                   label="buy & hold (total return)"))
+    print()
+    print(pd.DataFrame(rows).set_index("label")[
+        ["cagr", "ann_vol", "sharpe", "sortino", "max_drawdown", "total_return"]])
     print(f"\ndays short {100*ls['is_short'].mean():.0f}%   "
-          f"mean GROSS exposure {ls['gross_exposure'].mean():.2f}x   "
+          f"mean gross exposure {ls['gross_exposure'].mean():.2f}x   "
           f"mean net {ls['position'].mean():+.2f}x")
-    print("Sharpe here is EXCESS of the 6.5% risk-free rate -- a book that sits in")
-    print("cash most of the time would otherwise post a flattering ratio on T-bills.")
-    print("Shorting fights the index's drift and gives up the dividend yield. If the")
-    print("IC table above is not significant, the long/short row is a draw from noise.")
+    print("Sharpe is EXCESS of the risk-free rate -- a book that parks in cash would")
+    print("otherwise post a flattering ratio earned on T-bills.")
 
     # ---------------------------------------------------------------- VRP
     _rule("BACKTEST 2  --  variance risk premium carry (the profitable leg)")

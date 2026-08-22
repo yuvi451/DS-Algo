@@ -50,6 +50,13 @@ def module(name):
     return f"# ===== src/{name}.py =====\n" + text
 
 
+def module_upto(name, stop_marker):
+    """Inline a module only as far as `stop_marker` (keeps the simulator out)."""
+    text = module(name)
+    i = text.index(stop_marker)
+    return text[:i].rstrip() + "\n"
+
+
 NEWS_PIPELINE = r'''
 # ===== news collection: GDELT backfill + live RSS =====
 GDELT_DOC_ENDPOINT = "https://api.gdeltproject.org/api/v2/doc/doc"
@@ -327,6 +334,12 @@ TICKER          = "^NSEI"
 VIX_TICKER      = "^INDIAVIX"
 PRICE_YEARS     = 10
 
+# If yfinance is rate-limited (see section 3), attach a Kaggle dataset and put
+# the file paths here. A mounted CSV skips the network entirely and is the only
+# route that cannot be throttled.
+NIFTY_CSV       = None    # e.g. "/kaggle/input/nifty-50-index/NIFTY50.csv"
+VIX_CSV         = None    # e.g. "/kaggle/input/india-vix/INDIAVIX.csv"
+
 # ---- news -----------------------------------------------------------------
 RUN_NEWS        = True     # False -> price + VIX only (fast, still a full run)
 GDELT_CHUNK_DAYS = 7       # smaller = more coverage, more requests (250/response cap)
@@ -338,6 +351,12 @@ DIV_YIELD       = 0.012    # ^NSEI is a PRICE index -- dividends are not in it
 COST_BPS_CASH   = 7.5
 COST_BPS_FUT    = 5.0      # Nifty futures: 2 bps STT on the sell side + spread
 TARGET_ANN_VOL  = 0.12
+
+# Shorting is OFF by default. A volatility model cannot pick a side, so the
+# short leg rides entirely on the directional signals in section 9 -- and those
+# have small information coefficients. Turn this on only if the IC table there
+# shows a t-stat above 2 on your data. See section 10B.
+ALLOW_SHORT     = False
 
 # ---- model ----------------------------------------------------------------
 N_TRIALS        = 25
@@ -381,41 +400,36 @@ in. That is what makes the two comparable and the VRP strategy possible.
 India VIX was absent from v1 entirely and is the biggest single omission: it is
 a forward-looking, market-consensus volatility forecast, published daily and
 free, and it already impounds most of what news sentiment could carry.
+
+**On yfinance and Kaggle.** Yahoo rate-limits datacenter IP ranges hard, and
+Kaggle runners sit in those ranges. The call usually works, but it can return
+429 or an empty frame on a day when the identical call succeeds from a laptop.
+So the loader below tries three sources in order:
+
+1. **Local CSV** from a mounted Kaggle dataset — no internet, cannot be
+   throttled. Use this if the run matters.
+2. **yfinance** — convenient, usually fine.
+3. **Stooq** — a different host, friendlier to datacenter IPs. Carries the
+   Nifty index but **not** India VIX.
+
+If the download fails: *Add Data* in the right-hand panel, search for a Nifty 50
+and an India VIX dataset, then set `NIFTY_CSV` / `VIX_CSV` in the config cell to
+the mounted paths. Column naming is handled tolerantly — Yahoo's `Adj Close`,
+NSE's `dd-mm-yyyy` dates and `"21,880.90"` thousands separators all parse.
+
+India VIX is the dependency that actually matters: without it the VRP strategy
+in section 10C cannot run at all. Forecasting and the directional book still can.
 """),
+    code(module_upto("data", "def simulate_market(")),
     code('''
-import yfinance as yf
+prices, vix, provenance = load_market_data(
+    price_ticker=TICKER, vix_ticker=VIX_TICKER, years=PRICE_YEARS,
+    price_csv=NIFTY_CSV, vix_csv=VIX_CSV)
 
-
-def load_yf(ticker, years):
-    df = yf.download(ticker, period=f"{years}y", interval="1d",
-                     auto_adjust=False, progress=False)
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.get_level_values(0)
-    df = df.rename(columns=str.lower)
-    df.index = pd.to_datetime(df.index).tz_localize(None)
-    df.index.name = "date"
-    return df
-
-
-prices = load_yf(TICKER, PRICE_YEARS)[["open", "high", "low", "close", "volume"]].dropna()
-vix = load_yf(VIX_TICKER, PRICE_YEARS)["close"].dropna().rename("vix")
-
-assert len(prices) > 500, "price download failed -- is Internet enabled in Settings?"
-print(f"{TICKER}: {len(prices)} sessions  {prices.index.min().date()} -> {prices.index.max().date()}")
-print(f"{VIX_TICKER}: {len(vix)} sessions  mean {vix.mean():.1f}  max {vix.max():.1f}")
+assert len(prices) > 500, "not enough price history -- see the notes above"
+if vix is None:
+    print("\\nNo India VIX: section 10C (the only leg with a real edge) will be skipped.")
 prices.tail(3)
-'''),
-    code('''
-# The v1 bug, measured on your own data rather than assumed.
-gk = realized_vol(prices, "gk")
-total = realized_vol(prices, "total")
-share = (gk / total).median()
-cc_vol = np.log(prices["close"] / prices["close"].shift(1)).std() * np.sqrt(252)
-
-print(f"Nifty annualized close-to-close vol : {cc_vol:.1%}")
-print(f"median sigma_GK / sigma_total       : {share:.3f}")
-print(f"-> sizing off Garman-Klass over-levers by {1/share:.2f}x")
-print(f"overnight share of daily variance   : {1 - (gk**2).mean()/(total**2).mean():.1%}")
 '''),
     md("""
 ## 4. News: GDELT backfill, dedupe, relevance filter, FinBERT
@@ -615,9 +629,12 @@ good its Sharpe looks.
     code('''
 next_ret = table["log_return"].shift(-1)
 direction = build_direction(table, allow_short=True)
+d_ls_raw = direction["direction"]
 
 print("Information coefficient vs next-day return:\\n")
 print(signal_report(direction.reindex(preds.index), next_ret.reindex(preds.index)).round(4))
+print("\\nt-stat above 2 on the `direction` row means the signal is real. Below it,")
+print("any long/short equity curve below is a draw from noise -- leave ALLOW_SHORT off.")
 '''),
     md("""
 ## 10. Backtests
@@ -667,25 +684,39 @@ print(f"turnover       v1={bt_v1['position'].diff().abs().sum():.0f}   v2={bt_v2
 print(f"cost drag/yr   v1={252*bt_v1['cost'].mean():.2%}   v2={252*bt_v2['cost'].mean():.2%}")
 '''),
     code('''
-d_ls = direction["direction"].reindex(preds.index)
 d_lo = build_direction(table, allow_short=False)["direction"].reindex(preds.index)
-
-ls = long_short_backtest(d_ls, pred_vol, next_ret, target_ann_vol=TARGET_ANN_VOL,
-                          max_long=1.5, max_short=-1.0, cost_bps=COST_BPS_FUT,
-                          rf_annual=RF_ANNUAL, div_yield=DIV_YIELD,
-                          deadband=0.10, stop_drawdown=-0.25)
 lo = long_short_backtest(d_lo, pred_vol, next_ret, target_ann_vol=TARGET_ANN_VOL,
                           max_long=1.5, cost_bps=COST_BPS_FUT,
                           rf_annual=RF_ANNUAL, div_yield=DIV_YIELD,
                           deadband=0.10, stop_drawdown=-0.25)
 
-print("B -- LONG/SHORT   (Sharpe is EXCESS of the risk-free rate)\\n")
-print(pd.DataFrame([
+rows = [
     summarize(bt_v2["strategy_return"], RF_ANNUAL, label="overlay, no direction"),
-    summarize(lo["strategy_return"], RF_ANNUAL, label="directional, long-only"),
-    summarize(ls["strategy_return"], RF_ANNUAL, label="directional, LONG/SHORT"),
-    summarize(ls["buy_hold_return"], RF_ANNUAL, label="buy & hold (total return)"),
-]).set_index("label")[["cagr", "ann_vol", "sharpe", "sortino", "max_drawdown", "total_return"]])
+    summarize(lo["strategy_return"], RF_ANNUAL,    label="directional, long-only"),
+]
+
+ic = information_coefficient(d_ls_raw.reindex(preds.index), next_ret.reindex(preds.index))
+if ALLOW_SHORT:
+    ls = long_short_backtest(d_ls_raw.reindex(preds.index), pred_vol, next_ret,
+                              target_ann_vol=TARGET_ANN_VOL, max_long=1.5,
+                              max_short=-1.0, cost_bps=COST_BPS_FUT,
+                              rf_annual=RF_ANNUAL, div_yield=DIV_YIELD,
+                              deadband=0.10, stop_drawdown=-0.25)
+    rows.append(summarize(ls["strategy_return"], RF_ANNUAL, label="directional, LONG/SHORT"))
+else:
+    ls = lo
+    print("ALLOW_SHORT is False -- running long-only.")
+    print(f"Blended signal IC t-stat on your data: {ic['t_stat']:+.2f} "
+          f"(p={ic['p_value']:.3f}).")
+    print("Above 2 means the directional signal is real and shorting is worth")
+    print("enabling in the config cell. Below it, the short leg would just add")
+    print("turnover, financing drag and tail risk in exchange for noise.\\n")
+
+rows.append(summarize(lo["buy_hold_return"], RF_ANNUAL, label="buy & hold (total return)"))
+
+print("B -- DIRECTIONAL   (Sharpe is EXCESS of the risk-free rate)\\n")
+print(pd.DataFrame(rows).set_index("label")[
+    ["cagr", "ann_vol", "sharpe", "sortino", "max_drawdown", "total_return"]])
 
 print(f"\\ndays short {100*ls['is_short'].mean():.0f}%   "
       f"mean gross exposure {ls['gross_exposure'].mean():.2f}x   "
@@ -694,6 +725,9 @@ print("Excess-of-cash Sharpe matters here: a book that sits in cash half the tim
 print("would otherwise post a flattering ratio earned on T-bills.")
 '''),
     code('''
+HAVE_VIX = vix is not None and table["iv_daily"].notna().sum() > 200
+modelled = None
+
 hold = 5
 pred_rv5 = pd.Series(np.exp(preds5["model"]) * preds5["smearing"], index=preds5.index)
 realized_var = table["target_rvar_h5"].reindex(pred_rv5.index)
@@ -702,6 +736,10 @@ trailing = np.exp(table["log_rv_w"]).reindex(pred_rv5.index)
 
 ok = iv.notna() & pred_rv5.notna() & realized_var.notna() & trailing.notna()
 iv, pred_rv5, realized_var, trailing = iv[ok], pred_rv5[ok], realized_var[ok], trailing[ok]
+
+if not HAVE_VIX or ok.sum() < 200:
+    raise SystemExit("No usable India VIX -- section 10C skipped. Attach a VIX "
+                     "dataset and set VIX_CSV to run the VRP strategy.")
 
 kw = dict(hold_days=hold, cost_vol_pts=0.005, risk_fraction=0.15, cap_multiple=3.0)
 always   = vrp_backtest(iv, iv, realized_var, entry_z=-1e9, **kw)
@@ -730,36 +768,50 @@ premium that this backtest only approximates.
 """),
     code('''
 crisis = slice("2020-02-01", "2020-05-31")
-if modelled.loc[crisis].shape[0] > 10:
+rows = []
+if modelled is not None and modelled.loc[crisis].shape[0] > 10:
+    rows.append(summarize(modelled["strategy_return"].loc[crisis], label="VRP leg"))
+if bt_v2.loc[crisis].shape[0] > 10:
+    rows += [
+        summarize(ls["strategy_return"].loc[crisis],     label="directional book"),
+        summarize(bt_v2["strategy_return"].loc[crisis],  label="vol overlay"),
+        summarize(bt_v2["buy_hold_return"].loc[crisis],  label="buy & hold"),
+    ]
+
+if rows:
     print("MARCH 2020 STRESS TEST\\n")
-    print(pd.DataFrame([
-        summarize(modelled["strategy_return"].loc[crisis], label="VRP leg"),
-        summarize(ls["strategy_return"].loc[crisis],       label="long/short"),
-        summarize(bt_v2["strategy_return"].loc[crisis],    label="vol overlay"),
-        summarize(bt_v2["buy_hold_return"].loc[crisis],    label="buy & hold"),
-    ]).set_index("label")[["total_return", "max_drawdown", "worst_day"]])
+    print(pd.DataFrame(rows).set_index("label")[
+        ["total_return", "max_drawdown", "worst_day"]])
 else:
-    print("Sample does not span the 2020 crisis -- raise PRICE_YEARS before trusting the VRP leg.")
+    print("Sample does not span the 2020 crisis -- raise PRICE_YEARS before")
+    print("trusting any short-volatility number this notebook prints.")
 '''),
     md("## 11. Blend, and save everything"),
     code('''
-blended = combine({"ls": ls["strategy_return"], "vrp": modelled["strategy_return"]},
-                  {"ls": 0.6, "vrp": 0.4})
-corr = pd.DataFrame({"a": ls["strategy_return"],
-                     "b": modelled["strategy_return"]}).dropna().corr().iloc[0, 1]
+rows = [
+    summarize(bt_v1["strategy_return"], RF_ANNUAL, label="A. overlay, v1 config"),
+    summarize(bt_v2["strategy_return"], RF_ANNUAL, label="A. overlay, v2 config"),
+    summarize(lo["strategy_return"], RF_ANNUAL,    label="B. directional long-only"),
+]
+if ALLOW_SHORT:
+    rows.append(summarize(ls["strategy_return"], RF_ANNUAL, label="B. directional long/short"))
 
-results = pd.DataFrame([
-    summarize(bt_v1["strategy_return"], RF_ANNUAL,  label="A. overlay, v1 config"),
-    summarize(bt_v2["strategy_return"], RF_ANNUAL,  label="A. overlay, v2 config"),
-    summarize(lo["strategy_return"], RF_ANNUAL,     label="B. directional long-only"),
-    summarize(ls["strategy_return"], RF_ANNUAL,     label="B. directional long/short"),
-    summarize(modelled["strategy_return"],          label="C. VRP carry"),
-    summarize(blended,                              label="60/40 blend of B and C"),
-    summarize(ls["buy_hold_return"], RF_ANNUAL,     label="buy & hold"),
-]).set_index("label")
+if modelled is not None:
+    blended = combine({"dir": ls["strategy_return"], "vrp": modelled["strategy_return"]},
+                      {"dir": 0.6, "vrp": 0.4})
+    corr = pd.DataFrame({"a": ls["strategy_return"],
+                         "b": modelled["strategy_return"]}).dropna().corr().iloc[0, 1]
+    rows.append(summarize(modelled["strategy_return"], label="C. VRP carry"))
+    rows.append(summarize(blended, label="60/40 blend of B and C"))
+else:
+    corr = float("nan")
+
+rows.append(summarize(lo["buy_hold_return"], RF_ANNUAL, label="buy & hold"))
+results = pd.DataFrame(rows).set_index("label")
 
 print(results[["cagr", "ann_vol", "sharpe", "sortino", "max_drawdown", "total_return"]])
-print(f"\\ncorrelation between the long/short and VRP legs: {corr:+.3f}")
+if np.isfinite(corr):
+    print(f"\\ncorrelation between the directional and VRP legs: {corr:+.3f}")
 
 results.to_csv(WORK / "results_summary.csv")
 preds.to_csv(WORK / "walk_forward_predictions.csv")
@@ -769,16 +821,20 @@ print(f"\\nsaved to {WORK}")
 fig, axes = plt.subplots(2, 1, figsize=(14, 8), sharex=False)
 
 for name, s in [("A. overlay (v1 bugs)", bt_v1), ("A. overlay (fixed)", bt_v2),
-                ("B. long/short", ls)]:
+                ("B. directional", ls)]:
     axes[0].plot(s["strategy_equity"], lw=1.3, label=name)
 axes[0].plot(bt_v2["buy_hold_equity"], lw=1.3, ls="--", color="k", label="buy & hold")
 axes[0].set_title("Index strategies, net of costs, financing and carry")
 axes[0].legend(); axes[0].grid(alpha=0.3)
 
-axes[1].plot(modelled["strategy_equity"], lw=1.3, label="C. VRP, model-timed")
-axes[1].plot(always["strategy_equity"], lw=1.1, alpha=0.8, label="C. always short variance")
-axes[1].set_title("Variance risk premium carry")
-axes[1].legend(); axes[1].grid(alpha=0.3)
+if modelled is not None:
+    axes[1].plot(modelled["strategy_equity"], lw=1.3, label="C. VRP, model-timed")
+    axes[1].plot(always["strategy_equity"], lw=1.1, alpha=0.8, label="C. always short variance")
+    axes[1].set_title("Variance risk premium carry")
+    axes[1].legend()
+else:
+    axes[1].set_title("Variance risk premium carry -- skipped (no India VIX)")
+axes[1].grid(alpha=0.3)
 
 plt.tight_layout(); plt.show()
 '''),
