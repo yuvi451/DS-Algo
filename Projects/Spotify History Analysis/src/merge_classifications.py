@@ -16,7 +16,7 @@ SCRATCH = Path(
 
 def load_song_tags() -> dict:
     tags = {}
-    for f in sorted(glob.glob(str(SCRATCH / "*_chunk_*_out.tsv"))):
+    for f in sorted(glob.glob(str(SCRATCH / "*_out.tsv"))):
         language = "Hindi" if Path(f).name.startswith("hindi_") else "Punjabi"
         with open(f, encoding="utf-8") as fh:
             for line in fh:
