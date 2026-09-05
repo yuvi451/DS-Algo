@@ -4,5 +4,5 @@ __pycache__/
 data/raw/
 data/*.json
 data/*.zip
-output/*.csv
+output/
 *.parquet
