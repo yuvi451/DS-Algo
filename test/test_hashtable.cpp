@@ -88,7 +88,7 @@ static void testCollisionChaining() {
     printf("testCollisionChaining: OK\n");
 }
 
-// Enough keys to trigger several resizes, with deletes mid-migration.
+// Enough keys to trigger several resizes, the larger ones spread over many inserts.
 static void testProgressiveRehash() {
     constexpr int kKeys = 5000;
     HMap map(testEq, deleteTestNode);

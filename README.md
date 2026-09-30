@@ -36,6 +36,7 @@ src/server.cpp          KvStore, per-connection state, poll() event loop
 src/client.cpp          Sends one command per run and prints the reply
 bench/loadtest.cpp      Multi-threaded load generator
 test/                   Unit tests (plain assert) and test_integration.sh
+code-breakdown/         Line-by-line walkthrough, networking refresher, interview prep
 ```
 
 ## Design
