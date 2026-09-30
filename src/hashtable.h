@@ -3,20 +3,23 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <functional>
 #include <vector>
 
+// Intrusive node: embed it in your own struct (see Entry in server.cpp).
 struct HNode {
     HNode *next = nullptr;
     uint64_t hcode = 0;
 };
 
 using EqFn = bool (*)(const HNode *a, const HNode *b);
-using DeleteFn = std::function<void(HNode *)>;
+using DeleteFn = void (*)(HNode *node);
 
+// Chained hashtable that resizes incrementally: when the load factor is hit,
+// entries move from the old table to the new one a few at a time on each
+// insert/pop, so no single operation pays for the whole resize.
 class HMap {
 public:
-    HMap(EqFn eq, DeleteFn deleter);
+    HMap(EqFn eq, DeleteFn deleter) : eq_(eq), deleter_(deleter) {}
     ~HMap();
 
     HMap(const HMap &) = delete;
@@ -24,8 +27,8 @@ public:
 
     void insert(HNode *node);
     HNode *lookup(const HNode *key) const;
-    HNode *pop(const HNode *key);
-    size_t size() const;
+    HNode *pop(const HNode *key);  // caller takes ownership of the result
+    size_t size() const { return newer_.size + older_.size; }
 
 private:
     struct HTab {
@@ -45,7 +48,7 @@ private:
     EqFn eq_;
     DeleteFn deleter_;
     HTab newer_;
-    HTab older_;
+    HTab older_;  // non-empty only while a resize is in progress
     size_t migratePos_ = 0;
 };
 

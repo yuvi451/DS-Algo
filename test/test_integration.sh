@@ -6,7 +6,7 @@ SERVER_BIN="$ROOT_DIR/build/server_asan"
 CLIENT_BIN="$ROOT_DIR/build/client_asan"
 
 if [[ ! -x "$SERVER_BIN" || ! -x "$CLIENT_BIN" ]]; then
-    echo "build ASan binaries first: make $SERVER_BIN $CLIENT_BIN" >&2
+    echo "build ASan binaries first (or run: make test-integration)" >&2
     exit 1
 fi
 
@@ -14,6 +14,7 @@ fi
 SERVER_PID=$!
 trap 'kill "$SERVER_PID" 2>/dev/null || true; wait "$SERVER_PID" 2>/dev/null || true' EXIT
 
+# Wait for the server to accept connections.
 for _ in $(seq 1 20); do
     if "$CLIENT_BIN" get __warmup__ >/dev/null 2>&1; then
         break

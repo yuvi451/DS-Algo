@@ -1,133 +1,116 @@
 #include <cassert>
 #include <cstdio>
-#include <cstdlib>
+
 #include "../src/hashtable.h"
 
-struct TestNode : public HNode {
-    int key;
-    int val;
+struct TestNode : HNode {
+    int key = 0;
+    int val = 0;
 };
 
 static bool testEq(const HNode *a, const HNode *b) {
     return static_cast<const TestNode *>(a)->key == static_cast<const TestNode *>(b)->key;
 }
 
-static void deleteTestNode(HNode *n) {
-    delete static_cast<TestNode *>(n);
+static void deleteTestNode(HNode *node) {
+    delete static_cast<TestNode *>(node);
 }
 
-static TestNode *makeNode(int key, int val) {
-    auto *n = new TestNode();
-    n->key = key;
-    n->val = val;
-    n->hcode = hashBytes(reinterpret_cast<const uint8_t *>(&key), sizeof(key));
-    return n;
+static uint64_t hashInt(int key) {
+    return hashBytes(reinterpret_cast<const uint8_t *>(&key), sizeof(key));
 }
 
-static TestNode *find(HMap &map, int key) {
-    TestNode probe{};
+static TestNode *makeNode(int key, int val, uint64_t hcode) {
+    auto *node = new TestNode();
+    node->key = key;
+    node->val = val;
+    node->hcode = hcode;
+    return node;
+}
+
+static TestNode *find(const HMap &map, int key, uint64_t hcode) {
+    TestNode probe;
     probe.key = key;
-    probe.hcode = hashBytes(reinterpret_cast<const uint8_t *>(&key), sizeof(key));
-    HNode *found = map.lookup(&probe);
-    return found ? static_cast<TestNode *>(found) : nullptr;
+    probe.hcode = hcode;
+    return static_cast<TestNode *>(map.lookup(&probe));
+}
+
+static TestNode *find(const HMap &map, int key) {
+    return find(map, key, hashInt(key));
+}
+
+static bool popAndDelete(HMap &map, int key) {
+    TestNode probe;
+    probe.key = key;
+    probe.hcode = hashInt(key);
+    HNode *popped = map.pop(&probe);
+    if (!popped) {
+        return false;
+    }
+    deleteTestNode(popped);
+    return true;
 }
 
 static void testInsertAndLookup() {
     HMap map(testEq, deleteTestNode);
+    map.insert(makeNode(42, 100, hashInt(42)));
 
-    TestNode *n = makeNode(42, 100);
-    map.insert(n);
-
-    TestNode *found = find(map, 42);
-    assert(found != nullptr);
-    assert(found->val == 100);
+    assert(find(map, 42) != nullptr);
+    assert(find(map, 42)->val == 100);
     assert(find(map, 99) == nullptr);
-
     printf("testInsertAndLookup: OK\n");
 }
 
 static void testDelete() {
     HMap map(testEq, deleteTestNode);
-
-    TestNode *n = makeNode(7, 77);
-    map.insert(n);
+    map.insert(makeNode(7, 77, hashInt(7)));
     assert(map.size() == 1);
 
-    TestNode probe{};
-    probe.key = 7;
-    probe.hcode = hashBytes(reinterpret_cast<const uint8_t *>(&probe.key), sizeof(probe.key));
-    HNode *popped = map.pop(&probe);
-    assert(popped != nullptr);
-    delete static_cast<TestNode *>(popped);
-
+    assert(popAndDelete(map, 7));
+    assert(!popAndDelete(map, 7));
     assert(map.size() == 0);
     assert(find(map, 7) == nullptr);
-
     printf("testDelete: OK\n");
 }
 
 static void testCollisionChaining() {
     HMap map(testEq, deleteTestNode);
-
     for (int i = 0; i < 4; i++) {
-        auto *n = new TestNode();
-        n->key = i;
-        n->val = i * 10;
-        n->hcode = 1;  // force all four into the same bucket
-        map.insert(n);
+        map.insert(makeNode(i, i * 10, 1));  // same hcode: all land in one bucket
     }
     assert(map.size() == 4);
 
     for (int i = 0; i < 4; i++) {
-        TestNode probe{};
-        probe.key = i;
-        probe.hcode = 1;
-        HNode *found = map.lookup(&probe);
+        TestNode *found = find(map, i, 1);
         assert(found != nullptr);
-        assert(static_cast<TestNode *>(found)->val == i * 10);
+        assert(found->val == i * 10);
     }
-
     printf("testCollisionChaining: OK\n");
 }
 
-static constexpr int kRehashKeys = 5000;
-
+// Enough keys to trigger several resizes, with deletes mid-migration.
 static void testProgressiveRehash() {
+    constexpr int kKeys = 5000;
     HMap map(testEq, deleteTestNode);
 
-    for (int i = 0; i < kRehashKeys; i++) {
-        map.insert(makeNode(i, i));
+    for (int i = 0; i < kKeys; i++) {
+        map.insert(makeNode(i, i, hashInt(i)));
     }
-    assert(map.size() == static_cast<size_t>(kRehashKeys));
-
-    for (int i = 0; i < kRehashKeys; i++) {
-        TestNode *found = find(map, i);
-        assert(found != nullptr);
-        assert(found->val == i);
+    assert(map.size() == kKeys);
+    for (int i = 0; i < kKeys; i++) {
+        assert(find(map, i) != nullptr);
+        assert(find(map, i)->val == i);
     }
     assert(find(map, -1) == nullptr);
-    assert(find(map, kRehashKeys) == nullptr);
+    assert(find(map, kKeys) == nullptr);
 
-    for (int i = 0; i < kRehashKeys; i += 2) {
-        TestNode probe{};
-        probe.key = i;
-        probe.hcode = hashBytes(reinterpret_cast<const uint8_t *>(&probe.key), sizeof(probe.key));
-        HNode *popped = map.pop(&probe);
-        assert(popped != nullptr);
-        delete static_cast<TestNode *>(popped);
+    for (int i = 0; i < kKeys; i += 2) {
+        assert(popAndDelete(map, i));
     }
-    assert(map.size() == static_cast<size_t>(kRehashKeys / 2));
-
-    for (int i = 0; i < kRehashKeys; i++) {
-        TestNode *found = find(map, i);
-        if (i % 2 == 0) {
-            assert(found == nullptr);
-        } else {
-            assert(found != nullptr);
-            assert(found->val == i);
-        }
+    assert(map.size() == kKeys / 2);
+    for (int i = 0; i < kKeys; i++) {
+        assert((find(map, i) == nullptr) == (i % 2 == 0));
     }
-
     printf("testProgressiveRehash: OK\n");
 }
 

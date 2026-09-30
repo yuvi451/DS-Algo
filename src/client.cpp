@@ -1,33 +1,11 @@
-#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
 #include <unistd.h>
 
 #include "protocol.h"
-
-static int connectToServer() {
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (fd < 0) {
-        perror("socket()");
-        exit(1);
-    }
-
-    struct sockaddr_in addr {};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(SERVER_PORT);
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-
-    if (connect(fd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) != 0) {
-        perror("connect()");
-        exit(1);
-    }
-    return fd;
-}
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -35,39 +13,37 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    std::vector<std::string> args(argv + 1, argv + argc);
-
-    Buffer req;
-    if (!encodeRequest(req, args)) {
+    Buffer request;
+    if (!encodeRequest(request, std::vector<std::string>(argv + 1, argv + argc))) {
         std::cerr << "request too large\n";
         return 1;
     }
 
     int fd = connectToServer();
-    if (!writeFrame(fd, req.data(), req.size())) {
-        std::cerr << "write_frame failed\n";
+    if (fd < 0) {
+        perror("connect()");
+        return 1;
+    }
+    if (!writeFrame(fd, request)) {
+        std::cerr << "failed to send request\n";
+        return 1;
+    }
+    auto payload = readFrame(fd);
+    close(fd);
+    if (!payload) {
+        std::cerr << "failed to read response\n";
         return 1;
     }
 
-    auto resp = readFrame(fd);
-    if (!resp) {
-        std::cerr << "read_frame failed\n";
-        return 1;
-    }
-
-    auto parsed = parseResponse(resp->data() + 4, resp->size() - 4);
-    if (!parsed) {
+    auto response = parseResponse(payload->data(), payload->size());
+    if (!response) {
         std::cerr << "bad response\n";
         return 1;
     }
 
-    switch (parsed->status) {
+    switch (response->status) {
     case ResponseStatus::Ok:
-        if (!parsed->data.empty()) {
-            std::cout << parsed->data << "\n";
-        } else {
-            std::cout << "OK\n";
-        }
+        std::cout << (response->data.empty() ? "OK" : response->data) << "\n";
         break;
     case ResponseStatus::Nx:
         std::cout << "(nil)\n";
@@ -76,7 +52,5 @@ int main(int argc, char **argv) {
         std::cout << "(error) unknown command or wrong number of arguments\n";
         break;
     }
-
-    close(fd);
     return 0;
 }

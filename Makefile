@@ -1,53 +1,52 @@
 CXX := c++
 CXXFLAGS := -std=c++17 -Wall -Wextra
-RELEASE_FLAGS := -O2
-ASAN_FLAGS := -fsanitize=address -g
+RELEASE := $(CXXFLAGS) -O2
+ASAN := $(CXXFLAGS) -fsanitize=address -g
 
-SRC_DIR := src
-TEST_DIR := test
-BUILD_DIR := build
-BENCH_DIR := bench
+HEADERS := src/hashtable.h src/protocol.h
+SERVER_SRC := src/server.cpp src/hashtable.cpp src/protocol.cpp
+CLIENT_SRC := src/client.cpp src/protocol.cpp
 
-.PHONY: all test clean test-hashtable test-protocol test-integration bench
+.PHONY: all bench test test-hashtable test-protocol test-integration clean
 
-all: $(BUILD_DIR)/server $(BUILD_DIR)/client
-
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
-$(BUILD_DIR)/server: $(SRC_DIR)/server.cpp $(SRC_DIR)/hashtable.cpp $(SRC_DIR)/protocol.cpp $(SRC_DIR)/hashtable.h $(SRC_DIR)/protocol.h | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(RELEASE_FLAGS) -o $@ $(SRC_DIR)/server.cpp $(SRC_DIR)/hashtable.cpp $(SRC_DIR)/protocol.cpp
-
-$(BUILD_DIR)/client: $(SRC_DIR)/client.cpp $(SRC_DIR)/protocol.cpp $(SRC_DIR)/protocol.h | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(RELEASE_FLAGS) -o $@ $(SRC_DIR)/client.cpp $(SRC_DIR)/protocol.cpp
-
-$(BUILD_DIR)/server_asan: $(SRC_DIR)/server.cpp $(SRC_DIR)/hashtable.cpp $(SRC_DIR)/protocol.cpp $(SRC_DIR)/hashtable.h $(SRC_DIR)/protocol.h | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(ASAN_FLAGS) -o $@ $(SRC_DIR)/server.cpp $(SRC_DIR)/hashtable.cpp $(SRC_DIR)/protocol.cpp
-
-$(BUILD_DIR)/client_asan: $(SRC_DIR)/client.cpp $(SRC_DIR)/protocol.cpp $(SRC_DIR)/protocol.h | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(ASAN_FLAGS) -o $@ $(SRC_DIR)/client.cpp $(SRC_DIR)/protocol.cpp
-
-bench: $(BUILD_DIR)/loadtest
-
-$(BUILD_DIR)/loadtest: $(BENCH_DIR)/loadtest.cpp $(SRC_DIR)/protocol.cpp $(SRC_DIR)/protocol.h | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(RELEASE_FLAGS) -pthread -o $@ $(BENCH_DIR)/loadtest.cpp $(SRC_DIR)/protocol.cpp
-
+all: build/server build/client
+bench: build/loadtest
 test: test-hashtable test-protocol test-integration
 
-test-hashtable: $(BUILD_DIR)/test_hashtable
-	$(BUILD_DIR)/test_hashtable
+build:
+	mkdir -p build
 
-test-protocol: $(BUILD_DIR)/test_protocol
-	$(BUILD_DIR)/test_protocol
+# Release binaries
+build/server: $(SERVER_SRC) $(HEADERS) | build
+	$(CXX) $(RELEASE) -o $@ $(SERVER_SRC)
 
-test-integration: $(BUILD_DIR)/server_asan $(BUILD_DIR)/client_asan
-	$(TEST_DIR)/test_integration.sh
+build/client: $(CLIENT_SRC) $(HEADERS) | build
+	$(CXX) $(RELEASE) -o $@ $(CLIENT_SRC)
 
-$(BUILD_DIR)/test_hashtable: $(TEST_DIR)/test_hashtable.cpp $(SRC_DIR)/hashtable.cpp $(SRC_DIR)/hashtable.h | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_hashtable.cpp $(SRC_DIR)/hashtable.cpp
+build/loadtest: bench/loadtest.cpp src/protocol.cpp $(HEADERS) | build
+	$(CXX) $(RELEASE) -pthread -o $@ bench/loadtest.cpp src/protocol.cpp
 
-$(BUILD_DIR)/test_protocol: $(TEST_DIR)/test_protocol.cpp $(SRC_DIR)/protocol.cpp $(SRC_DIR)/protocol.h | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) $(ASAN_FLAGS) -o $@ $(TEST_DIR)/test_protocol.cpp $(SRC_DIR)/protocol.cpp
+# ASan binaries for tests
+build/server_asan: $(SERVER_SRC) $(HEADERS) | build
+	$(CXX) $(ASAN) -o $@ $(SERVER_SRC)
+
+build/client_asan: $(CLIENT_SRC) $(HEADERS) | build
+	$(CXX) $(ASAN) -o $@ $(CLIENT_SRC)
+
+build/test_hashtable: test/test_hashtable.cpp src/hashtable.cpp $(HEADERS) | build
+	$(CXX) $(ASAN) -o $@ test/test_hashtable.cpp src/hashtable.cpp
+
+build/test_protocol: test/test_protocol.cpp src/protocol.cpp $(HEADERS) | build
+	$(CXX) $(ASAN) -o $@ test/test_protocol.cpp src/protocol.cpp
+
+test-hashtable: build/test_hashtable
+	build/test_hashtable
+
+test-protocol: build/test_protocol
+	build/test_protocol
+
+test-integration: build/server_asan build/client_asan
+	test/test_integration.sh
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf build

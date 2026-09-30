@@ -8,8 +8,11 @@
 #include <string_view>
 #include <vector>
 
-constexpr size_t K_MAX_MSG = 4096;
-constexpr uint16_t SERVER_PORT = 1234;
+// All integers on the wire are 32-bit in host byte order (little-endian on
+// x86/ARM). See README.md for the full message layout.
+constexpr size_t kMaxMsg = 4096;
+constexpr size_t kHeaderLen = 4;
+constexpr uint16_t kServerPort = 1234;
 
 enum class ResponseStatus : uint8_t {
     Ok = 0,
@@ -21,22 +24,21 @@ class Buffer {
 public:
     void append(const uint8_t *data, size_t len);
     void append(std::string_view s);
-    void consume(size_t n);
+    void consume(size_t n);  // drop n bytes from the front
 
     const uint8_t *data() const { return buf_.data(); }
     size_t size() const { return buf_.size(); }
-    bool empty() const { return buf_.empty(); }
 
 private:
     std::vector<uint8_t> buf_;
 };
 
-bool encodeRequest(Buffer &out, const std::vector<std::string> &args);
+// Request payload: [nargs] then [len][bytes] per arg.
+bool encodeRequest(Buffer &out, const std::vector<std::string> &args);  // false if > kMaxMsg
 std::optional<std::vector<std::string>> parseRequest(const uint8_t *data, size_t len);
 
-// When data is empty, the len/data fields are omitted entirely, so a
-// RES_OK response for an empty-string value is indistinguishable on the
-// wire from a RES_OK/RES_NX response with no value.
+// Response payload: [1-byte status] then, only if data is non-empty, [len][bytes].
+// So an empty-string value looks the same on the wire as "no value".
 void encodeResponse(Buffer &out, ResponseStatus status, std::string_view data = {});
 
 struct Response {
@@ -45,23 +47,19 @@ struct Response {
 };
 std::optional<Response> parseResponse(const uint8_t *data, size_t len);
 
+// Frame: [payload length][payload].
+void appendFrame(Buffer &out, const Buffer &payload);
+
 enum class FrameStatus {
-    Incomplete,
-    Malformed,
+    Incomplete,  // wait for more bytes
+    Malformed,   // declared length exceeds kMaxMsg
     Complete,
 };
+FrameStatus tryParseFrame(const uint8_t *buf, size_t len, size_t &payloadLen);
 
-struct FrameInfo {
-    size_t frameLen;
-    size_t payloadOff;
-    size_t payloadLen;
-};
-
-FrameStatus tryParseFrame(const uint8_t *buf, size_t bufLen, FrameInfo &out);
-
-bool readFull(int fd, uint8_t *buf, size_t n);
-bool writeAll(int fd, const uint8_t *buf, size_t n);
-std::optional<Buffer> readFrame(int fd);
-bool writeFrame(int fd, const uint8_t *payload, size_t len);
+// Blocking helpers used by the client and the load tester.
+int connectToServer();  // -1 on failure, errno set
+bool writeFrame(int fd, const Buffer &payload);
+std::optional<std::vector<uint8_t>> readFrame(int fd);  // returns the payload only
 
 #endif

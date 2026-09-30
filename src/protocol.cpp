@@ -2,109 +2,23 @@
 
 #include <cassert>
 #include <cstring>
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
-void Buffer::append(const uint8_t *data, size_t len) {
-    buf_.insert(buf_.end(), data, data + len);
+namespace {
+
+void appendU32(Buffer &out, uint32_t v) {
+    out.append(reinterpret_cast<const uint8_t *>(&v), 4);
 }
 
-void Buffer::append(std::string_view s) {
-    append(reinterpret_cast<const uint8_t *>(s.data()), s.size());
-}
-
-void Buffer::consume(size_t n) {
-    assert(n <= buf_.size());
-    buf_.erase(buf_.begin(), buf_.begin() + static_cast<long>(n));
-}
-
-bool encodeRequest(Buffer &out, const std::vector<std::string> &args) {
-    uint32_t n = static_cast<uint32_t>(args.size());
-    out.append(reinterpret_cast<const uint8_t *>(&n), 4);
-    for (const auto &arg : args) {
-        uint32_t l = static_cast<uint32_t>(arg.size());
-        out.append(reinterpret_cast<const uint8_t *>(&l), 4);
-        out.append(arg);
-    }
-    return out.size() <= K_MAX_MSG;
-}
-
-std::optional<std::vector<std::string>> parseRequest(const uint8_t *data, size_t len) {
-    if (len < 4) {
-        return std::nullopt;
-    }
-    uint32_t nargs;
-    std::memcpy(&nargs, data, 4);
-    if (nargs > 1024) {
-        return std::nullopt;
-    }
-
-    size_t pos = 4;
-    std::vector<std::string> args;
-    args.reserve(nargs);
-    for (uint32_t i = 0; i < nargs; i++) {
-        if (pos + 4 > len) {
-            return std::nullopt;
-        }
-        uint32_t l;
-        std::memcpy(&l, data + pos, 4);
-        pos += 4;
-        if (pos + l > len) {
-            return std::nullopt;
-        }
-        args.emplace_back(reinterpret_cast<const char *>(data + pos), l);
-        pos += l;
-    }
-    if (pos != len) {
-        return std::nullopt;
-    }
-    return args;
-}
-
-void encodeResponse(Buffer &out, ResponseStatus status, std::string_view data) {
-    uint8_t s = static_cast<uint8_t>(status);
-    out.append(&s, 1);
-    if (!data.empty()) {
-        uint32_t l = static_cast<uint32_t>(data.size());
-        out.append(reinterpret_cast<const uint8_t *>(&l), 4);
-        out.append(data);
-    }
-}
-
-std::optional<Response> parseResponse(const uint8_t *data, size_t len) {
-    if (len < 1) {
-        return std::nullopt;
-    }
-    ResponseStatus status = static_cast<ResponseStatus>(data[0]);
-    if (len == 1) {
-        return Response{status, std::string()};
-    }
-    if (len < 5) {
-        return std::nullopt;
-    }
-    uint32_t l;
-    std::memcpy(&l, data + 1, 4);
-    if (5 + static_cast<size_t>(l) != len) {
-        return std::nullopt;
-    }
-    return Response{status, std::string(reinterpret_cast<const char *>(data + 5), l)};
-}
-
-FrameStatus tryParseFrame(const uint8_t *buf, size_t bufLen, FrameInfo &out) {
-    if (bufLen < 4) {
-        return FrameStatus::Incomplete;
-    }
-    uint32_t len;
-    std::memcpy(&len, buf, 4);
-    if (len > K_MAX_MSG) {
-        return FrameStatus::Malformed;
-    }
-    if (bufLen < 4 + static_cast<size_t>(len)) {
-        return FrameStatus::Incomplete;
-    }
-    out.frameLen = 4 + len;
-    out.payloadOff = 4;
-    out.payloadLen = len;
-    return FrameStatus::Complete;
+uint32_t readU32(const uint8_t *data) {
+    uint32_t v;
+    std::memcpy(&v, data, 4);
+    return v;
 }
 
 bool readFull(int fd, uint8_t *buf, size_t n) {
@@ -131,41 +45,142 @@ bool writeAll(int fd, const uint8_t *buf, size_t n) {
     return true;
 }
 
-std::optional<Buffer> readFrame(int fd) {
-    uint8_t head[4];
-    if (!readFull(fd, head, 4)) {
-        return std::nullopt;
-    }
-    uint32_t len;
-    std::memcpy(&len, head, 4);
-    if (len > K_MAX_MSG) {
-        return std::nullopt;
-    }
+}  // namespace
 
-    Buffer out;
-    out.append(head, 4);
-    if (len > 0) {
-        std::vector<uint8_t> tmp(len);
-        if (!readFull(fd, tmp.data(), len)) {
-            return std::nullopt;
-        }
-        out.append(tmp.data(), len);
-    }
-    return out;
+void Buffer::append(const uint8_t *data, size_t len) {
+    buf_.insert(buf_.end(), data, data + len);
 }
 
-bool writeFrame(int fd, const uint8_t *payload, size_t len) {
-    if (len > K_MAX_MSG) {
+void Buffer::append(std::string_view s) {
+    append(reinterpret_cast<const uint8_t *>(s.data()), s.size());
+}
+
+void Buffer::consume(size_t n) {
+    assert(n <= buf_.size());
+    buf_.erase(buf_.begin(), buf_.begin() + static_cast<long>(n));
+}
+
+bool encodeRequest(Buffer &out, const std::vector<std::string> &args) {
+    appendU32(out, static_cast<uint32_t>(args.size()));
+    for (const auto &arg : args) {
+        appendU32(out, static_cast<uint32_t>(arg.size()));
+        out.append(arg);
+    }
+    return out.size() <= kMaxMsg;
+}
+
+std::optional<std::vector<std::string>> parseRequest(const uint8_t *data, size_t len) {
+    if (len < 4) {
+        return std::nullopt;
+    }
+    uint32_t nargs = readU32(data);
+    if (nargs > 1024) {
+        return std::nullopt;
+    }
+
+    size_t pos = 4;
+    std::vector<std::string> args;
+    args.reserve(nargs);
+    for (uint32_t i = 0; i < nargs; i++) {
+        if (pos + 4 > len) {
+            return std::nullopt;
+        }
+        uint32_t l = readU32(data + pos);
+        pos += 4;
+        if (pos + l > len) {
+            return std::nullopt;
+        }
+        args.emplace_back(reinterpret_cast<const char *>(data + pos), l);
+        pos += l;
+    }
+    if (pos != len) {
+        return std::nullopt;
+    }
+    return args;
+}
+
+void encodeResponse(Buffer &out, ResponseStatus status, std::string_view data) {
+    uint8_t s = static_cast<uint8_t>(status);
+    out.append(&s, 1);
+    if (!data.empty()) {
+        appendU32(out, static_cast<uint32_t>(data.size()));
+        out.append(data);
+    }
+}
+
+std::optional<Response> parseResponse(const uint8_t *data, size_t len) {
+    if (len < 1) {
+        return std::nullopt;
+    }
+    auto status = static_cast<ResponseStatus>(data[0]);
+    if (len == 1) {
+        return Response{status, std::string()};
+    }
+    if (len < 5 || 5 + static_cast<size_t>(readU32(data + 1)) != len) {
+        return std::nullopt;
+    }
+    return Response{status, std::string(reinterpret_cast<const char *>(data + 5), len - 5)};
+}
+
+void appendFrame(Buffer &out, const Buffer &payload) {
+    appendU32(out, static_cast<uint32_t>(payload.size()));
+    out.append(payload.data(), payload.size());
+}
+
+FrameStatus tryParseFrame(const uint8_t *buf, size_t len, size_t &payloadLen) {
+    if (len < kHeaderLen) {
+        return FrameStatus::Incomplete;
+    }
+    payloadLen = readU32(buf);
+    if (payloadLen > kMaxMsg) {
+        return FrameStatus::Malformed;
+    }
+    if (len < kHeaderLen + payloadLen) {
+        return FrameStatus::Incomplete;
+    }
+    return FrameStatus::Complete;
+}
+
+int connectToServer() {
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+        return -1;
+    }
+    int one = 1;
+    setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(kServerPort);
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    if (connect(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) != 0) {
+        close(fd);
+        return -1;
+    }
+    return fd;
+}
+
+bool writeFrame(int fd, const Buffer &payload) {
+    if (payload.size() > kMaxMsg) {
         return false;
     }
-    uint8_t head[4];
-    uint32_t l = static_cast<uint32_t>(len);
-    std::memcpy(head, &l, 4);
-    if (!writeAll(fd, head, 4)) {
-        return false;
+    Buffer frame;
+    appendFrame(frame, payload);
+    return writeAll(fd, frame.data(), frame.size());
+}
+
+std::optional<std::vector<uint8_t>> readFrame(int fd) {
+    uint8_t header[kHeaderLen];
+    if (!readFull(fd, header, kHeaderLen)) {
+        return std::nullopt;
     }
-    if (len > 0 && !writeAll(fd, payload, len)) {
-        return false;
+    uint32_t len = readU32(header);
+    if (len > kMaxMsg) {
+        return std::nullopt;
     }
-    return true;
+    std::vector<uint8_t> payload(len);
+    if (!readFull(fd, payload.data(), len)) {
+        return std::nullopt;
+    }
+    return payload;
 }

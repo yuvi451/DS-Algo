@@ -5,7 +5,7 @@
 namespace {
 constexpr size_t kInitSize = 4;
 constexpr size_t kMaxLoadFactor = 8;
-constexpr size_t kRehashWork = 128;
+constexpr size_t kRehashWork = 128;  // entries migrated per insert/pop
 }  // namespace
 
 void HMap::htabInit(HTab &htab, size_t n) {
@@ -22,12 +22,12 @@ void HMap::htabInsert(HTab &htab, HNode *node) {
     htab.size++;
 }
 
+// Returns the slot pointing at the matching node, so the caller can unlink it.
 HNode **HMap::htabLookup(HTab &htab, const HNode *key, EqFn eq) {
     if (htab.tab.empty()) {
         return nullptr;
     }
-    size_t pos = key->hcode & htab.mask;
-    HNode **from = &htab.tab[pos];
+    HNode **from = &htab.tab[key->hcode & htab.mask];
     for (HNode *cur; (cur = *from) != nullptr; from = &cur->next) {
         if (cur->hcode == key->hcode && eq(cur, key)) {
             return from;
@@ -66,25 +66,14 @@ void HMap::helpRehashing() {
     }
 }
 
-HMap::HMap(EqFn eq, DeleteFn deleter) : eq_(eq), deleter_(std::move(deleter)) {}
-
 HMap::~HMap() {
-    for (size_t i = 0; i < newer_.tab.size(); i++) {
-        for (HNode *node = newer_.tab[i]; node;) {
-            HNode *next = node->next;
-            if (deleter_) {
+    for (HTab *htab : {&newer_, &older_}) {
+        for (HNode *node : htab->tab) {
+            while (node) {
+                HNode *next = node->next;
                 deleter_(node);
+                node = next;
             }
-            node = next;
-        }
-    }
-    for (size_t i = 0; i < older_.tab.size(); i++) {
-        for (HNode *node = older_.tab[i]; node;) {
-            HNode *next = node->next;
-            if (deleter_) {
-                deleter_(node);
-            }
-            node = next;
         }
     }
 }
@@ -95,44 +84,36 @@ void HMap::insert(HNode *node) {
     }
     htabInsert(newer_, node);
 
-    if (older_.tab.empty()) {
-        size_t threshold = (newer_.mask + 1) * kMaxLoadFactor;
-        if (newer_.size >= threshold) {
-            startResizing();
-        }
+    bool resizing = !older_.tab.empty();
+    if (!resizing && newer_.size >= (newer_.mask + 1) * kMaxLoadFactor) {
+        startResizing();
     }
     helpRehashing();
 }
 
 HNode *HMap::lookup(const HNode *key) const {
+    // htabLookup hands out a mutable slot for pop(); here we only read it.
     auto *self = const_cast<HMap *>(this);
-    HNode **from = htabLookup(self->newer_, key, eq_);
-    if (!from) {
-        from = htabLookup(self->older_, key, eq_);
-    }
-    return from ? *from : nullptr;
-}
-
-HNode *HMap::pop(const HNode *key) {
-    HNode **from = htabLookup(newer_, key, eq_);
-    if (from) {
-        HNode *node = htabDetach(newer_, from);
-        helpRehashing();
-        return node;
-    }
-    from = htabLookup(older_, key, eq_);
-    if (from) {
-        HNode *node = htabDetach(older_, from);
-        helpRehashing();
-        return node;
+    for (HTab *htab : {&self->newer_, &self->older_}) {
+        if (HNode **from = htabLookup(*htab, key, eq_)) {
+            return *from;
+        }
     }
     return nullptr;
 }
 
-size_t HMap::size() const {
-    return newer_.size + older_.size;
+HNode *HMap::pop(const HNode *key) {
+    for (HTab *htab : {&newer_, &older_}) {
+        if (HNode **from = htabLookup(*htab, key, eq_)) {
+            HNode *node = htabDetach(*htab, from);
+            helpRehashing();
+            return node;
+        }
+    }
+    return nullptr;
 }
 
+// FNV-1a
 uint64_t hashBytes(const uint8_t *data, size_t len) {
     uint64_t h = 0xcbf29ce484222325ULL;
     for (size_t i = 0; i < len; i++) {
