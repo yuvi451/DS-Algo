@@ -1,0 +1,39 @@
+#include "protocol.h"
+
+void appendU32(string &out, uint32_t v) {
+    out.append((char *)&v, 4);  // look at v as 4 raw bytes and copy them
+}
+
+uint32_t readU32(const string &s, size_t pos) {
+    uint32_t v;
+    s.copy((char *)&v, 4, pos);  // copy 4 bytes from s[pos] into v
+    return v;
+}
+
+string encodeRequest(const vector<string> &args) {
+    string out;
+    appendU32(out, args.size());
+    for (const string &arg : args) {
+        appendU32(out, arg.size());
+        out += arg;
+    }
+    return out;
+}
+
+// The bytes come from another program, so check every length before using it.
+bool parseRequest(const string &payload, vector<string> &args) {
+    if (payload.size() < 4) return false;
+    uint32_t nargs = readU32(payload, 0);
+    if (nargs > 1024) return false;
+
+    size_t pos = 4;
+    for (uint32_t i = 0; i < nargs; i++) {
+        if (pos + 4 > payload.size()) return false;
+        uint32_t len = readU32(payload, pos);
+        pos += 4;
+        if (pos + len > payload.size()) return false;
+        args.push_back(payload.substr(pos, len));
+        pos += len;
+    }
+    return pos == payload.size();  // no junk left over
+}

@@ -1,0 +1,33 @@
+i <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build MicroRedis from Scratch</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="menu" class="icon-btn" aria-label="Toggle lesson list">☰</button>
+  <a class="brand" href="#welcome"><span class="logo">◆</span> Build MicroRedis <span class="sub">from scratch, in C++</span></a>
+  <div class="progress" title="Lessons completed">
+    <div class="bar"><div id="progress-fill"></div></div>
+    <span id="progress-text"></span>
+  </div>
+</header>
+
+<nav id="sidebar" aria-label="Lessons">
+  <input id="search" type="search" placeholder="Search lessons…" aria-label="Search lessons">
+  <div id="toc"></div>
+  <button id="reset" class="link-btn">Reset progress</button>
+</nav>
+
+<main id="main">
+  <article id="lesson"></article>
+  <footer id="pager"></footer>
+</main>
+
+<script src="assets/content.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
