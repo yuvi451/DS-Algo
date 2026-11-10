@@ -1,13 +1,12 @@
-// Closed-loop load test: N threads, one connection each, alternating set/get
-// and timing every round trip.
+// Load test: N threads, one connection each, alternating set/get and timing
+// every round trip.
 //
-// usage: loadtest [n_clients=200] [duration_sec=10]
+// usage: loadtest [clients=200] [seconds=10]
 
 #include <algorithm>
 #include <chrono>
-#include <cstdio>
-#include <cstdlib>
-#include <numeric>
+#include <iomanip>
+#include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
@@ -15,80 +14,79 @@
 #include <unistd.h>
 
 #include "../src/protocol.h"
+using namespace std;
 
-using Clock = std::chrono::steady_clock;
+// Microseconds since some fixed moment. Only differences between two calls matter.
+double nowUs() {
+    return chrono::duration<double, micro>(chrono::steady_clock::now().time_since_epoch()).count();
+}
 
-struct ThreadResult {
-    std::vector<double> latenciesUs;
+struct Result {
+    vector<double> latencies;  // microseconds, one per request
     bool connectFailed = false;
 };
 
-static void worker(int threadId, Clock::time_point deadline, ThreadResult &result) {
+// Runs in its own thread. Only writes to its own Result, so no locks needed.
+void worker(int id, double endUs, Result *result) {
     int fd = connectToServer();
     if (fd < 0) {
-        result.connectFailed = true;
+        result->connectFailed = true;
         return;
     }
-
-    for (long i = 0; Clock::now() < deadline; i++) {
-        std::string key = "lt:" + std::to_string(threadId) + ":" + std::to_string(i / 2);
-        std::vector<std::string> args;
+    for (int i = 0; nowUs() < endUs; i++) {
+        string key = "lt:" + to_string(id) + ":" + to_string(i / 2);
+        string request;
         if (i % 2 == 0) {
-            args = {"set", key, "v" + std::to_string(i)};
+            request = encodeRequest({"set", key, "v" + to_string(i)});
         } else {
-            args = {"get", key};
+            request = encodeRequest({"get", key});
         }
-        Buffer request;
-        encodeRequest(request, args);
 
-        auto t0 = Clock::now();
-        if (!writeFrame(fd, request) || !readFrame(fd)) {
-            break;
-        }
-        auto t1 = Clock::now();
-        result.latenciesUs.push_back(std::chrono::duration<double, std::micro>(t1 - t0).count());
+        double start = nowUs();
+        string reply;
+        if (!writeFrame(fd, request) || !readFrame(fd, reply)) break;
+        result->latencies.push_back(nowUs() - start);
     }
     close(fd);
 }
 
 int main(int argc, char **argv) {
-    int nClients = argc > 1 ? std::atoi(argv[1]) : 200;
-    double duration = argc > 2 ? std::atof(argv[2]) : 10.0;
+    int clients = argc > 1 ? stoi(argv[1]) : 200;
+    double seconds = argc > 2 ? stod(argv[2]) : 10;
 
-    auto start = Clock::now();
-    auto deadline = start + std::chrono::duration_cast<Clock::duration>(
-                                std::chrono::duration<double>(duration));
+    double startUs = nowUs();
+    double endUs = startUs + seconds * 1e6;
 
-    std::vector<ThreadResult> results(static_cast<size_t>(nClients));
-    std::vector<std::thread> threads;
-    for (int i = 0; i < nClients; i++) {
-        threads.emplace_back(worker, i, deadline, std::ref(results[static_cast<size_t>(i)]));
+    vector<Result> results(clients);
+    vector<thread> threads;
+    for (int i = 0; i < clients; i++) {
+        threads.push_back(thread(worker, i, endUs, &results[i]));
     }
-    for (auto &t : threads) {
-        t.join();
-    }
-    double elapsed = std::chrono::duration<double>(Clock::now() - start).count();
+    for (thread &t : threads) t.join();  // wait for every thread to finish
+    double elapsed = (nowUs() - startUs) / 1e6;
 
     int failed = 0;
-    std::vector<double> all;
-    for (const auto &r : results) {
-        failed += r.connectFailed;
-        all.insert(all.end(), r.latenciesUs.begin(), r.latenciesUs.end());
+    vector<double> all;
+    for (Result &r : results) {
+        if (r.connectFailed) failed++;
+        for (double us : r.latencies) all.push_back(us);
     }
 
-    printf("clients=%d duration_target=%.1fs actual_wall=%.3fs failed_connects=%d\n",
-           nClients, duration, elapsed, failed);
+    cout << fixed << setprecision(1);  // print doubles with 1 decimal place
+    cout << "clients=" << clients << " duration_target=" << seconds << "s actual_wall="
+         << elapsed << "s failed_connects=" << failed << endl;
     if (all.empty()) {
-        printf("total_ops=0 (no successful requests)\n");
+        cout << "total_ops=0 (no successful requests)" << endl;
         return failed > 0 ? 1 : 0;
     }
 
-    std::sort(all.begin(), all.end());
-    auto pct = [&](size_t p) { return all[all.size() * p / 100]; };
-    double mean = std::accumulate(all.begin(), all.end(), 0.0) / static_cast<double>(all.size());
+    sort(all.begin(), all.end());
+    double sum = 0;
+    for (double us : all) sum += us;
+    size_t n = all.size();
 
-    printf("total_ops=%zu throughput=%.1f ops/sec\n", all.size(), static_cast<double>(all.size()) / elapsed);
-    printf("latency_us: min=%.1f p50=%.1f p90=%.1f p99=%.1f max=%.1f mean=%.1f\n",
-           all.front(), pct(50), pct(90), pct(99), all.back(), mean);
+    cout << "total_ops=" << n << " throughput=" << n / elapsed << " ops/sec" << endl;
+    cout << "latency_us: min=" << all[0] << " p50=" << all[n * 50 / 100] << " p90=" << all[n * 90 / 100]
+         << " p99=" << all[n * 99 / 100] << " max=" << all[n - 1] << " mean=" << sum / n << endl;
     return 0;
 }

@@ -1,52 +1,36 @@
-CXX := c++
-CXXFLAGS := -std=c++17 -Wall -Wextra
-RELEASE := $(CXXFLAGS) -O2
-ASAN := $(CXXFLAGS) -fsanitize=address -g
-
-HEADERS := src/hashtable.h src/protocol.h
-SERVER_SRC := src/server.cpp src/hashtable.cpp src/protocol.cpp
-CLIENT_SRC := src/client.cpp src/protocol.cpp
-
-.PHONY: all bench test test-hashtable test-protocol test-integration clean
+CXX = c++
+FLAGS = -std=c++17 -Wall -O2
 
 all: build/server build/client
-bench: build/loadtest
-test: test-hashtable test-protocol test-integration
 
-build:
+build/server: src/server.cpp src/hashtable.cpp src/protocol.cpp src/hashtable.h src/protocol.h
 	mkdir -p build
+	$(CXX) $(FLAGS) -o build/server src/server.cpp src/hashtable.cpp src/protocol.cpp
 
-# Release binaries
-build/server: $(SERVER_SRC) $(HEADERS) | build
-	$(CXX) $(RELEASE) -o $@ $(SERVER_SRC)
+build/client: src/client.cpp src/protocol.cpp src/protocol.h
+	mkdir -p build
+	$(CXX) $(FLAGS) -o build/client src/client.cpp src/protocol.cpp
 
-build/client: $(CLIENT_SRC) $(HEADERS) | build
-	$(CXX) $(RELEASE) -o $@ $(CLIENT_SRC)
+build/loadtest: bench/loadtest.cpp src/protocol.cpp src/protocol.h
+	mkdir -p build
+	$(CXX) $(FLAGS) -pthread -o build/loadtest bench/loadtest.cpp src/protocol.cpp
 
-build/loadtest: bench/loadtest.cpp src/protocol.cpp $(HEADERS) | build
-	$(CXX) $(RELEASE) -pthread -o $@ bench/loadtest.cpp src/protocol.cpp
+build/test_hashtable: test/test_hashtable.cpp src/hashtable.cpp src/hashtable.h
+	mkdir -p build
+	$(CXX) $(FLAGS) -o build/test_hashtable test/test_hashtable.cpp src/hashtable.cpp
 
-# ASan binaries for tests
-build/server_asan: $(SERVER_SRC) $(HEADERS) | build
-	$(CXX) $(ASAN) -o $@ $(SERVER_SRC)
+build/test_protocol: test/test_protocol.cpp src/protocol.cpp src/protocol.h
+	mkdir -p build
+	$(CXX) $(FLAGS) -o build/test_protocol test/test_protocol.cpp src/protocol.cpp
 
-build/client_asan: $(CLIENT_SRC) $(HEADERS) | build
-	$(CXX) $(ASAN) -o $@ $(CLIENT_SRC)
+bench: build/loadtest
 
-build/test_hashtable: test/test_hashtable.cpp src/hashtable.cpp $(HEADERS) | build
-	$(CXX) $(ASAN) -o $@ test/test_hashtable.cpp src/hashtable.cpp
-
-build/test_protocol: test/test_protocol.cpp src/protocol.cpp $(HEADERS) | build
-	$(CXX) $(ASAN) -o $@ test/test_protocol.cpp src/protocol.cpp
-
-test-hashtable: build/test_hashtable
+test: build/test_hashtable build/test_protocol build/server build/client
 	build/test_hashtable
-
-test-protocol: build/test_protocol
 	build/test_protocol
-
-test-integration: build/server_asan build/client_asan
 	test/test_integration.sh
 
 clean:
 	rm -rf build
+
+.PHONY: all bench test clean

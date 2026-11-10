@@ -1,196 +1,119 @@
 #include <cerrno>
-#include <csignal>
-#include <cstdio>
 #include <cstdlib>
-#include <memory>
-#include <optional>
+#include <cstring>
+#include <iostream>
 #include <string>
 #include <vector>
 
 #include <arpa/inet.h>
 #include <fcntl.h>
-#include <netinet/in.h>
 #include <poll.h>
-#include <sys/socket.h>
+#include <signal.h>
 #include <unistd.h>
 
 #include "hashtable.h"
 #include "protocol.h"
+using namespace std;
 
-[[noreturn]] static void die(const char *msg) {
-    perror(msg);
+void die(const string &what) {
+    cerr << what << " failed: " << strerror(errno) << endl;
     exit(1);
 }
 
-static void setNonBlocking(int fd) {
+// After this, read/write/accept on fd never wait. If they can't do anything
+// right now they return -1 with errno == EAGAIN.
+void setNonBlocking(int fd) {
     int flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1 || fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
-        die("fcntl()");
-    }
+    fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
 // ---- Key-value store ----
 
-struct Entry : HNode {
-    std::string key;
-    std::string val;
-};
+HashMap db;
 
-static bool entryEq(const HNode *lhs, const HNode *rhs) {
-    return static_cast<const Entry *>(lhs)->key == static_cast<const Entry *>(rhs)->key;
-}
-
-static void entryDelete(HNode *node) {
-    delete static_cast<Entry *>(node);
-}
-
-class KvStore {
-public:
-    std::optional<std::string> get(std::string_view key) const {
-        Entry probe = makeProbe(key);
-        HNode *node = map_.lookup(&probe);
-        if (!node) {
-            return std::nullopt;
-        }
-        return static_cast<Entry *>(node)->val;
-    }
-
-    void set(std::string_view key, std::string_view val) {
-        Entry probe = makeProbe(key);
-        if (HNode *node = map_.lookup(&probe)) {
-            static_cast<Entry *>(node)->val = val;
-            return;
-        }
-        auto *entry = new Entry(std::move(probe));
-        entry->val = val;
-        map_.insert(entry);
-    }
-
-    bool del(std::string_view key) {
-        Entry probe = makeProbe(key);
-        HNode *node = map_.pop(&probe);
-        if (!node) {
-            return false;
-        }
-        entryDelete(node);
-        return true;
-    }
-
-private:
-    static Entry makeProbe(std::string_view key) {
-        Entry probe;
-        probe.key = key;
-        probe.hcode = hashBytes(reinterpret_cast<const uint8_t *>(key.data()), key.size());
-        return probe;
-    }
-
-    HMap map_{entryEq, entryDelete};
-};
-
-static void runCommand(KvStore &store, const std::vector<std::string> &args, Buffer &out) {
+// Runs one command and returns the response payload.
+string runCommand(const vector<string> &args) {
     if (args.size() == 2 && args[0] == "get") {
-        auto val = store.get(args[1]);
-        if (val) {
-            encodeResponse(out, ResponseStatus::Ok, *val);
-        } else {
-            encodeResponse(out, ResponseStatus::Nx);
-        }
-    } else if (args.size() == 3 && args[0] == "set") {
-        store.set(args[1], args[2]);
-        encodeResponse(out, ResponseStatus::Ok);
-    } else if (args.size() == 2 && args[0] == "del") {
-        encodeResponse(out, store.del(args[1]) ? ResponseStatus::Ok : ResponseStatus::Nx);
-    } else {
-        encodeResponse(out, ResponseStatus::Err);
+        string val;
+        if (db.get(args[1], val)) return encodeResponse(RES_OK, val);
+        return encodeResponse(RES_NX);
     }
+    if (args.size() == 3 && args[0] == "set") {
+        db.set(args[1], args[2]);
+        return encodeResponse(RES_OK);
+    }
+    if (args.size() == 2 && args[0] == "del") {
+        if (db.del(args[1])) return encodeResponse(RES_OK);
+        return encodeResponse(RES_NX);
+    }
+    return encodeResponse(RES_ERR);
 }
 
 // ---- Connections ----
 
 struct Conn {
-    explicit Conn(int fd) : fd(fd) { setNonBlocking(fd); }
-    ~Conn() { close(fd); }
-
-    Conn(const Conn &) = delete;
-    Conn &operator=(const Conn &) = delete;
-
-    const int fd;
-    bool wantWrite = false;
-    bool wantClose = false;
-    Buffer incoming;
-    Buffer outgoing;
+    int fd = -1;
+    bool wantWrite = false;  // outgoing has bytes: ask poll() for POLLOUT
+    bool wantClose = false;  // the event loop should close this connection
+    string incoming;         // bytes read but not handled yet
+    string outgoing;         // replies waiting to be written
 };
 
-// Handles every complete request in the buffer (clients may pipeline).
-static void handleRequests(KvStore &store, Conn &conn) {
+// Handles every complete request in incoming (a client may send several at once).
+void handleRequests(Conn *conn) {
     while (true) {
-        size_t payloadLen = 0;
-        FrameStatus status = tryParseFrame(conn.incoming.data(), conn.incoming.size(), payloadLen);
-        if (status == FrameStatus::Incomplete) {
+        size_t len = 0;
+        FrameResult r = tryParseFrame(conn->incoming, len);
+        if (r == FRAME_INCOMPLETE) return;  // wait for more bytes
+
+        vector<string> args;
+        if (r == FRAME_TOO_BIG || !parseRequest(conn->incoming.substr(HEADER_LEN, len), args)) {
+            conn->wantClose = true;  // garbage: hang up
             return;
         }
-        std::optional<std::vector<std::string>> args;
-        if (status == FrameStatus::Complete) {
-            args = parseRequest(conn.incoming.data() + kHeaderLen, payloadLen);
-        }
-        if (!args) {
-            conn.wantClose = true;
-            return;
-        }
-
-        Buffer response;
-        runCommand(store, *args, response);
-        appendFrame(conn.outgoing, response);
-        conn.incoming.consume(kHeaderLen + payloadLen);
+        conn->outgoing += makeFrame(runCommand(args));
+        conn->incoming.erase(0, HEADER_LEN + len);  // done with this request
     }
 }
 
-static void handleRead(KvStore &store, Conn &conn) {
-    uint8_t buf[64 * 1024];
-    ssize_t rv = read(conn.fd, buf, sizeof(buf));
-    if (rv < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+void handleRead(Conn *conn) {
+    char buf[64 * 1024];
+    int n = read(conn->fd, buf, sizeof(buf));
+    if (n < 0 && errno == EAGAIN) return;  // nothing to read after all
+    if (n <= 0) {
+        conn->wantClose = true;  // error, or the client hung up (n == 0)
         return;
     }
-    if (rv <= 0) {
-        conn.wantClose = true;
-        return;
-    }
-    conn.incoming.append(buf, static_cast<size_t>(rv));
-    handleRequests(store, conn);
-    conn.wantWrite = conn.outgoing.size() > 0;
+    conn->incoming.append(buf, n);
+    handleRequests(conn);
+    conn->wantWrite = !conn->outgoing.empty();
 }
 
-static void handleWrite(Conn &conn) {
-    ssize_t rv = write(conn.fd, conn.outgoing.data(), conn.outgoing.size());
-    if (rv < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+void handleWrite(Conn *conn) {
+    int n = write(conn->fd, conn->outgoing.data(), conn->outgoing.size());
+    if (n < 0 && errno == EAGAIN) return;  // socket is full, try later
+    if (n < 0) {
+        conn->wantClose = true;
         return;
     }
-    if (rv < 0) {
-        conn.wantClose = true;
-        return;
-    }
-    conn.outgoing.consume(static_cast<size_t>(rv));
-    conn.wantWrite = conn.outgoing.size() > 0;
+    conn->outgoing.erase(0, n);  // write() may have sent only part of it
+    conn->wantWrite = !conn->outgoing.empty();
 }
 
-static int makeListener() {
+int makeListener() {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (fd < 0) {
-        die("socket()");
-    }
-    int one = 1;
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
+    if (fd < 0) die("socket()");
+    int yes = 1;
+    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));  // allow quick restarts
 
-    sockaddr_in addr{};
+    sockaddr_in addr = {};
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(kServerPort);
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    if (bind(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) != 0) {
-        die("bind()");
-    }
-    if (listen(fd, SOMAXCONN) != 0) {
-        die("listen()");
-    }
+    addr.sin_port = htons(PORT);
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);  // 127.0.0.1
+    // "::bind" = the operating system's bind(). Plain "bind" would mean
+    // std::bind, an unrelated function pulled in by "using namespace std".
+    if (::bind(fd, (sockaddr *)&addr, sizeof(addr)) != 0) die("bind()");
+    if (listen(fd, SOMAXCONN) != 0) die("listen()");
     setNonBlocking(fd);
     return fd;
 }
@@ -198,55 +121,51 @@ static int makeListener() {
 // ---- Event loop ----
 
 int main() {
-    signal(SIGPIPE, SIG_IGN);
-    KvStore store;
+    signal(SIGPIPE, SIG_IGN);  // writing to a closed socket: return an error, don't kill us
     int listenFd = makeListener();
-    fprintf(stderr, "listening on 127.0.0.1:%d\n", kServerPort);
+    cout << "listening on 127.0.0.1:" << PORT << endl;
 
-    std::vector<std::unique_ptr<Conn>> conns;  // indexed by fd
-    std::vector<pollfd> pollArgs;
+    vector<Conn *> conns;  // conns[fd] is the connection on that fd, or nullptr
 
     while (true) {
-        pollArgs.clear();
-        pollArgs.push_back({listenFd, POLLIN, 0});
-        for (const auto &conn : conns) {
-            if (conn) {
-                short events = POLLIN | (conn->wantWrite ? POLLOUT : 0);
-                pollArgs.push_back({conn->fd, events, 0});
-            }
+        // 1. List every socket we want to hear about.
+        vector<pollfd> fds;
+        fds.push_back({listenFd, POLLIN, 0});
+        for (Conn *conn : conns) {
+            if (conn == nullptr) continue;
+            short events = POLLIN;
+            if (conn->wantWrite) events |= POLLOUT;
+            fds.push_back({conn->fd, events, 0});
         }
 
-        if (poll(pollArgs.data(), static_cast<nfds_t>(pollArgs.size()), -1) < 0) {
-            if (errno == EINTR) {
-                continue;
-            }
+        // 2. Sleep until at least one of them is ready.
+        if (poll(fds.data(), fds.size(), -1) < 0) {
+            if (errno == EINTR) continue;  // interrupted by a signal, just retry
             die("poll()");
         }
 
-        if (pollArgs[0].revents & POLLIN) {
+        // 3. A new client is waiting?
+        if (fds[0].revents & POLLIN) {
             int fd = accept(listenFd, nullptr, nullptr);
             if (fd >= 0) {
-                if (static_cast<size_t>(fd) >= conns.size()) {
-                    conns.resize(static_cast<size_t>(fd) + 1);
-                }
-                conns[static_cast<size_t>(fd)] = std::make_unique<Conn>(fd);
+                setNonBlocking(fd);
+                if (fd >= (int)conns.size()) conns.resize(fd + 1, nullptr);
+                conns[fd] = new Conn();
+                conns[fd]->fd = fd;
             }
         }
 
-        for (size_t i = 1; i < pollArgs.size(); i++) {
-            short revents = pollArgs[i].revents;
-            auto &conn = conns[static_cast<size_t>(pollArgs[i].fd)];
-            if (!revents || !conn) {
-                continue;
-            }
-            if (revents & POLLIN) {
-                handleRead(store, *conn);
-            }
-            if (!conn->wantClose && (revents & POLLOUT)) {
-                handleWrite(*conn);
-            }
-            if (conn->wantClose || (revents & (POLLERR | POLLHUP))) {
-                conn.reset();
+        // 4. Serve every client that is ready.
+        for (size_t i = 1; i < fds.size(); i++) {
+            short ready = fds[i].revents;
+            if (ready == 0) continue;
+            Conn *conn = conns[fds[i].fd];
+            if (ready & POLLIN) handleRead(conn);
+            if ((ready & POLLOUT) && !conn->wantClose) handleWrite(conn);
+            if (conn->wantClose || (ready & (POLLERR | POLLHUP))) {
+                close(conn->fd);
+                conns[conn->fd] = nullptr;
+                delete conn;
             }
         }
     }

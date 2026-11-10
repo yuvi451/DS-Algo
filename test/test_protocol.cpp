@@ -1,119 +1,95 @@
 #include <cassert>
-#include <cstdio>
-#include <cstring>
+#include <iostream>
 
 #include <sys/socket.h>
 #include <unistd.h>
 
 #include "../src/protocol.h"
+using namespace std;
 
-static void testBufferAppendGrows() {
-    Buffer buf;
-    for (int i = 0; i < 1000; i++) {
-        uint8_t b = static_cast<uint8_t>(i);
-        buf.append(&b, 1);
-    }
-    assert(buf.size() == 1000);
-    for (int i = 0; i < 1000; i++) {
-        assert(buf.data()[i] == static_cast<uint8_t>(i));
-    }
-    printf("testBufferAppendGrows: OK\n");
+void testU32Roundtrip() {
+    string s;
+    appendU32(s, 5);
+    assert(s.size() == 4);
+    assert(s[0] == 5 && s[1] == 0 && s[2] == 0 && s[3] == 0);  // smallest byte first
+    assert(readU32(s, 0) == 5);
+    cout << "testU32Roundtrip: OK" << endl;
 }
 
-static void testBufferConsume() {
-    Buffer buf;
-    buf.append("hello world");
-    buf.consume(6);
-    assert(buf.size() == 5);
-    assert(std::memcmp(buf.data(), "world", 5) == 0);
-    printf("testBufferConsume: OK\n");
+void testRequestRoundtrip() {
+    string payload = encodeRequest({"set", "foo", "bar"});
+    vector<string> args;
+    assert(parseRequest(payload, args));
+    assert(args.size() == 3);
+    assert(args[0] == "set" && args[1] == "foo" && args[2] == "bar");
+    cout << "testRequestRoundtrip: OK" << endl;
 }
 
-static void testRequestRoundtrip() {
-    Buffer out;
-    assert(encodeRequest(out, {"set", "foo", "bar"}));
-
-    auto parsed = parseRequest(out.data(), out.size());
-    assert(parsed.has_value());
-    assert((*parsed == std::vector<std::string>{"set", "foo", "bar"}));
-    printf("testRequestRoundtrip: OK\n");
+void testRequestRejectsTruncated() {
+    string bad;
+    appendU32(bad, 5);  // claims 5 args, provides none
+    vector<string> args;
+    assert(!parseRequest(bad, args));
+    cout << "testRequestRejectsTruncated: OK" << endl;
 }
 
-static void testRequestRejectsTruncated() {
-    uint8_t bad[4];
-    uint32_t nargs = 5;  // claims 5 args, provides none
-    std::memcpy(bad, &nargs, 4);
-    assert(!parseRequest(bad, 4).has_value());
-    printf("testRequestRejectsTruncated: OK\n");
+void testResponseRoundtripWithData() {
+    string payload = encodeResponse(RES_OK, "bar");
+    Status status;
+    string data;
+    assert(parseResponse(payload, status, data));
+    assert(status == RES_OK);
+    assert(data == "bar");
+    cout << "testResponseRoundtripWithData: OK" << endl;
 }
 
-static void testResponseRoundtripWithData() {
-    Buffer out;
-    encodeResponse(out, ResponseStatus::Ok, "bar");
-
-    auto resp = parseResponse(out.data(), out.size());
-    assert(resp.has_value());
-    assert(resp->status == ResponseStatus::Ok);
-    assert(resp->data == "bar");
-    printf("testResponseRoundtripWithData: OK\n");
+void testResponseRoundtripStatusOnly() {
+    string payload = encodeResponse(RES_NX);
+    Status status;
+    string data;
+    assert(parseResponse(payload, status, data));
+    assert(status == RES_NX);
+    assert(data.empty());
+    cout << "testResponseRoundtripStatusOnly: OK" << endl;
 }
 
-static void testResponseRoundtripStatusOnly() {
-    Buffer out;
-    encodeResponse(out, ResponseStatus::Nx);
+void testTryParseFrame() {
+    string payload = encodeResponse(RES_OK, "hi");
+    string framed = makeFrame(payload);
 
-    auto resp = parseResponse(out.data(), out.size());
-    assert(resp.has_value());
-    assert(resp->status == ResponseStatus::Nx);
-    assert(resp->data.empty());
-    printf("testResponseRoundtripStatusOnly: OK\n");
+    size_t len = 0;
+    assert(tryParseFrame(framed.substr(0, 3), len) == FRAME_INCOMPLETE);
+    assert(tryParseFrame(framed.substr(0, framed.size() - 1), len) == FRAME_INCOMPLETE);
+    assert(tryParseFrame(framed, len) == FRAME_COMPLETE);
+    assert(len == payload.size());
+    assert(HEADER_LEN + len == framed.size());
+    cout << "testTryParseFrame: OK" << endl;
 }
 
-static void testTryParseFrame() {
-    Buffer payload;
-    encodeResponse(payload, ResponseStatus::Ok, "hi");
-    Buffer framed;
-    appendFrame(framed, payload);
-
-    size_t payloadLen = 0;
-    assert(tryParseFrame(framed.data(), kHeaderLen, payloadLen) == FrameStatus::Incomplete);
-    assert(tryParseFrame(framed.data(), framed.size() - 1, payloadLen) == FrameStatus::Incomplete);
-    assert(tryParseFrame(framed.data(), framed.size(), payloadLen) == FrameStatus::Complete);
-    assert(payloadLen == payload.size());
-    assert(kHeaderLen + payloadLen == framed.size());
-    printf("testTryParseFrame: OK\n");
+void testTryParseFrameRejectsOversized() {
+    string buf;
+    appendU32(buf, MAX_MSG + 1);
+    size_t len = 0;
+    assert(tryParseFrame(buf, len) == FRAME_TOO_BIG);
+    cout << "testTryParseFrameRejectsOversized: OK" << endl;
 }
 
-static void testTryParseFrameRejectsOversized() {
-    uint8_t buf[4];
-    uint32_t huge = kMaxMsg + 1;
-    std::memcpy(buf, &huge, 4);
-    size_t payloadLen = 0;
-    assert(tryParseFrame(buf, 4, payloadLen) == FrameStatus::Malformed);
-    printf("testTryParseFrameRejectsOversized: OK\n");
-}
-
-static void testFrameIoOverSocketpair() {
-    int fds[2];
+void testFrameIoOverSocketpair() {
+    int fds[2];  // two sockets already connected to each other
     assert(socketpair(AF_UNIX, SOCK_STREAM, 0, fds) == 0);
 
-    Buffer payload;
-    payload.append("ping");
-    assert(writeFrame(fds[0], payload));
-
-    auto got = readFrame(fds[1]);
-    assert(got.has_value());
-    assert(got->size() == 4);
-    assert(std::memcmp(got->data(), "ping", 4) == 0);
+    assert(writeFrame(fds[0], "ping"));
+    string got;
+    assert(readFrame(fds[1], got));
+    assert(got == "ping");
 
     close(fds[0]);
     close(fds[1]);
-    printf("testFrameIoOverSocketpair: OK\n");
+    cout << "testFrameIoOverSocketpair: OK" << endl;
 }
 
 int main() {
-    testBufferAppendGrows();
-    testBufferConsume();
+    testU32Roundtrip();
     testRequestRoundtrip();
     testRequestRejectsTruncated();
     testResponseRoundtripWithData();
@@ -121,6 +97,6 @@ int main() {
     testTryParseFrame();
     testTryParseFrameRejectsOversized();
     testFrameIoOverSocketpair();
-    printf("All protocol tests passed.\n");
+    cout << "All protocol tests passed." << endl;
     return 0;
 }

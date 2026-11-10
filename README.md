@@ -5,6 +5,10 @@ of [Build Your Own Redis](https://build-your-own.org/redis/). It supports
 `get`, `set` and `del` over TCP using its own binary protocol (not RESP, so
 `redis-cli` won't work). There are no dependencies beyond the standard library.
 
+The code is deliberately plain, beginner-friendly C++ (`using namespace std`,
+`cout`, structs, `new`/`delete`, strings as byte buffers). The goal is to
+understand how Redis works, not to show off C++.
+
 ## Build and run
 
 ```sh
@@ -19,46 +23,47 @@ build/client get foo         # (nil)
 
 | Target | What it does |
 |---|---|
-| `make` | Release build of the server and client (`-O2`) |
-| `make test` | Unit tests plus the integration test, all built with AddressSanitizer |
+| `make` | Builds the server and client (`-O2`) |
+| `make test` | Unit tests plus the integration test |
 | `make bench` | Builds `build/loadtest` |
 | `make clean` | Removes `build/` |
 
-The integration test starts the ASan server and runs about 10,000 client
-commands to force several hashtable resizes, so it takes about a minute.
+The integration test starts the server and runs about 10,000 client commands
+to force several hashtable resizes, so it takes about 30 seconds.
 
 ## Layout
 
 ```
-src/hashtable.{h,cpp}   HMap: intrusive chained hashtable with incremental resizing
-src/protocol.{h,cpp}    Buffer, message encoding/parsing, framing, blocking client I/O
-src/server.cpp          KvStore, per-connection state, poll() event loop
+src/hashtable.{h,cpp}   HashMap: chained hashtable with incremental resizing
+src/protocol.{h,cpp}    message encoding/parsing, framing, blocking client I/O
+src/server.cpp          runCommand, per-connection state, poll() event loop
 src/client.cpp          Sends one command per run and prints the reply
 bench/loadtest.cpp      Multi-threaded load generator
 test/                   Unit tests (plain assert) and test_integration.sh
-code-breakdown/         Line-by-line walkthrough, networking refresher, interview prep
+interview-prep.md       System design, trade-offs and likely interview questions
+tutorial/               Beginner course that rebuilds the project step by step (open tutorial/index.html)
 ```
 
 ## Design
 
 ### Event loop (`server.cpp`)
 A single thread runs a `poll()` loop over non-blocking sockets. Each `Conn`
-holds an `incoming` and an `outgoing` buffer. When a socket is readable, the
+holds an `incoming` and an `outgoing` buffer (plain strings). When a socket is readable, the
 server reads up to 64 KB and handles every complete request in `incoming`
 (clients may pipeline). Each reply is framed and appended to `outgoing`.
 `POLLOUT` is requested only while `outgoing` has data, and partial writes are
-resumed on the next loop. Connections are stored in a vector indexed by fd.
+resumed on the next loop. Connections are stored in a vector of `Conn *`
+indexed by fd.
 `SIGPIPE` is ignored.
 
 ### Hashtable (`hashtable.cpp`)
-- Nodes are intrusive: `Entry` inherits from `HNode` (`next` and `hcode`),
-  so the table never allocates per entry.
+- Each bucket is a linked list of `Node`s (`key`, `val`, saved `hash`, `next`).
 - Bucket counts are powers of two, so a key's bucket is `hash & mask`. The
   hash is FNV-1a.
-- When the average reaches 8 entries per bucket, the table becomes `older_`
-  and a new table twice the size becomes `newer_`. Every `insert` and `pop`
+- When the average reaches 8 entries per bucket, the table becomes `older`
+  and a new table twice the size becomes `newer`. Every `set` and `del`
   then moves up to 128 entries across, so no single call pays for a full
-  resize. Lookups check `newer_` first, then `older_`.
+  resize. Lookups check `newer` first, then `older`.
 
 ### Wire protocol (`protocol.h`)
 Integers are 32-bit, in host byte order (little-endian on x86/ARM).
@@ -101,7 +106,7 @@ latency_us: min=182.1 p50=1017.6 p90=1235.2 p99=1948.8 max=21110.4
 
 - An empty value can't be told apart from no value: after `set k ""`, `get k`
   prints `OK`.
-- `Buffer::consume` erases from the front of a vector, which is O(n) per call.
+- `erase(0, n)` on the front of the `incoming`/`outgoing` strings is O(n) per call.
 - No backpressure: a client that sends requests without reading replies makes
   its `outgoing` buffer grow without limit.
 - Replies still queued when a client closes its end are dropped.

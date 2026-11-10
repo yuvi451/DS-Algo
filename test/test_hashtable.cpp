@@ -1,124 +1,67 @@
 #include <cassert>
-#include <cstdio>
+#include <iostream>
 
 #include "../src/hashtable.h"
+using namespace std;
 
-struct TestNode : HNode {
-    int key = 0;
-    int val = 0;
-};
-
-static bool testEq(const HNode *a, const HNode *b) {
-    return static_cast<const TestNode *>(a)->key == static_cast<const TestNode *>(b)->key;
+void testSetAndGet() {
+    HashMap m;
+    string val;
+    assert(!m.get("name", val));
+    m.set("name", "redis");
+    assert(m.get("name", val));
+    assert(val == "redis");
+    m.set("name", "microredis");  // overwrite
+    assert(m.get("name", val));
+    assert(val == "microredis");
+    assert(m.size() == 1);
+    cout << "testSetAndGet: OK" << endl;
 }
 
-static void deleteTestNode(HNode *node) {
-    delete static_cast<TestNode *>(node);
+void testDel() {
+    HashMap m;
+    m.set("a", "1");
+    assert(m.del("a"));
+    assert(!m.del("a"));
+    assert(m.size() == 0);
+    string val;
+    assert(!m.get("a", val));
+    cout << "testDel: OK" << endl;
 }
 
-static uint64_t hashInt(int key) {
-    return hashBytes(reinterpret_cast<const uint8_t *>(&key), sizeof(key));
-}
-
-static TestNode *makeNode(int key, int val, uint64_t hcode) {
-    auto *node = new TestNode();
-    node->key = key;
-    node->val = val;
-    node->hcode = hcode;
-    return node;
-}
-
-static TestNode *find(const HMap &map, int key, uint64_t hcode) {
-    TestNode probe;
-    probe.key = key;
-    probe.hcode = hcode;
-    return static_cast<TestNode *>(map.lookup(&probe));
-}
-
-static TestNode *find(const HMap &map, int key) {
-    return find(map, key, hashInt(key));
-}
-
-static bool popAndDelete(HMap &map, int key) {
-    TestNode probe;
-    probe.key = key;
-    probe.hcode = hashInt(key);
-    HNode *popped = map.pop(&probe);
-    if (!popped) {
-        return false;
+// Enough keys to make the table grow several times. Checks that every key is
+// still found while nodes are halfway between the two tables.
+void testGrowing() {
+    const int N = 5000;
+    HashMap m;
+    bool sawGrowing = false;
+    for (int i = 0; i < N; i++) {
+        m.set("key" + to_string(i), "val" + to_string(i));
+        if (!m.older.buckets.empty()) sawGrowing = true;
     }
-    deleteTestNode(popped);
-    return true;
-}
+    assert(sawGrowing);
+    assert(m.size() == N);
 
-static void testInsertAndLookup() {
-    HMap map(testEq, deleteTestNode);
-    map.insert(makeNode(42, 100, hashInt(42)));
-
-    assert(find(map, 42) != nullptr);
-    assert(find(map, 42)->val == 100);
-    assert(find(map, 99) == nullptr);
-    printf("testInsertAndLookup: OK\n");
-}
-
-static void testDelete() {
-    HMap map(testEq, deleteTestNode);
-    map.insert(makeNode(7, 77, hashInt(7)));
-    assert(map.size() == 1);
-
-    assert(popAndDelete(map, 7));
-    assert(!popAndDelete(map, 7));
-    assert(map.size() == 0);
-    assert(find(map, 7) == nullptr);
-    printf("testDelete: OK\n");
-}
-
-static void testCollisionChaining() {
-    HMap map(testEq, deleteTestNode);
-    for (int i = 0; i < 4; i++) {
-        map.insert(makeNode(i, i * 10, 1));  // same hcode: all land in one bucket
+    string val;
+    for (int i = 0; i < N; i++) {
+        assert(m.get("key" + to_string(i), val));
+        assert(val == "val" + to_string(i));
     }
-    assert(map.size() == 4);
+    assert(!m.get("key" + to_string(N), val));
 
-    for (int i = 0; i < 4; i++) {
-        TestNode *found = find(map, i, 1);
-        assert(found != nullptr);
-        assert(found->val == i * 10);
+    for (int i = 0; i < N; i += 2) assert(m.del("key" + to_string(i)));
+    assert(m.size() == N / 2);
+    for (int i = 0; i < N; i++) {
+        bool found = m.get("key" + to_string(i), val);
+        assert(found == (i % 2 == 1));  // only odd keys remain
     }
-    printf("testCollisionChaining: OK\n");
-}
-
-// Enough keys to trigger several resizes, the larger ones spread over many inserts.
-static void testProgressiveRehash() {
-    constexpr int kKeys = 5000;
-    HMap map(testEq, deleteTestNode);
-
-    for (int i = 0; i < kKeys; i++) {
-        map.insert(makeNode(i, i, hashInt(i)));
-    }
-    assert(map.size() == kKeys);
-    for (int i = 0; i < kKeys; i++) {
-        assert(find(map, i) != nullptr);
-        assert(find(map, i)->val == i);
-    }
-    assert(find(map, -1) == nullptr);
-    assert(find(map, kKeys) == nullptr);
-
-    for (int i = 0; i < kKeys; i += 2) {
-        assert(popAndDelete(map, i));
-    }
-    assert(map.size() == kKeys / 2);
-    for (int i = 0; i < kKeys; i++) {
-        assert((find(map, i) == nullptr) == (i % 2 == 0));
-    }
-    printf("testProgressiveRehash: OK\n");
+    cout << "testGrowing: OK" << endl;
 }
 
 int main() {
-    testInsertAndLookup();
-    testDelete();
-    testCollisionChaining();
-    testProgressiveRehash();
-    printf("All hashtable tests passed.\n");
+    testSetAndGet();
+    testDel();
+    testGrowing();
+    cout << "All hashtable tests passed." << endl;
     return 0;
 }

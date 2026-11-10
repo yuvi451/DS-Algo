@@ -2,11 +2,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SERVER_BIN="$ROOT_DIR/build/server_asan"
-CLIENT_BIN="$ROOT_DIR/build/client_asan"
+SERVER_BIN="$ROOT_DIR/build/server"
+CLIENT_BIN="$ROOT_DIR/build/client"
 
 if [[ ! -x "$SERVER_BIN" || ! -x "$CLIENT_BIN" ]]; then
-    echo "build ASan binaries first (or run: make test-integration)" >&2
+    echo "build the server and client first (or run: make test)" >&2
     exit 1
 fi
 
@@ -45,7 +45,7 @@ out="$("$CLIENT_BIN" get foo)"
 out="$("$CLIENT_BIN" nosuchcmd a b c)"
 [[ "$out" == "(error) unknown command or wrong number of arguments" ]] || fail "expected error for unknown command, got: $out"
 
-echo "Inserting 10000 keys to force a resize (this takes roughly a minute)..."
+echo "Inserting 10000 keys to force a resize (this takes a little while)..."
 for i in $(seq 0 9999); do
     "$CLIENT_BIN" set "key$i" "val$i" >/dev/null
 done

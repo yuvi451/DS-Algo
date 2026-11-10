@@ -1,57 +1,40 @@
-#ifndef HASHTABLE_H
-#define HASHTABLE_H
+#pragma once
 
-#include <cstddef>
 #include <cstdint>
+#include <string>
 #include <vector>
+using namespace std;
 
-// Intrusive node: embed it in your own struct (see Entry in server.cpp).
-struct HNode {
-    HNode *next = nullptr;
-    uint64_t hcode = 0;
+// One key-value pair. Pairs that land in the same bucket form a linked list.
+struct Node {
+    string key;
+    string val;
+    uint64_t hash;
+    Node *next;
 };
 
-using EqFn = bool (*)(const HNode *a, const HNode *b);
-using DeleteFn = void (*)(HNode *node);
-
-// Chained hashtable that resizes incrementally: when the load factor is hit,
-// entries move from the old table to the new one a few at a time on each
-// insert/pop, so no single operation pays for the whole resize.
-class HMap {
-public:
-    HMap(EqFn eq, DeleteFn deleter) : eq_(eq), deleter_(deleter) {}
-    ~HMap();
-
-    HMap(const HMap &) = delete;
-    HMap &operator=(const HMap &) = delete;
-
-    void insert(HNode *node);
-    HNode *lookup(const HNode *key) const;
-    HNode *pop(const HNode *key);  // caller takes ownership of the result
-    size_t size() const { return newer_.size + older_.size; }
-
-private:
-    struct HTab {
-        std::vector<HNode *> tab;
-        size_t mask = 0;
-        size_t size = 0;
-    };
-
-    static void htabInit(HTab &htab, size_t n);
-    static void htabInsert(HTab &htab, HNode *node);
-    static HNode **htabLookup(HTab &htab, const HNode *key, EqFn eq);
-    static HNode *htabDetach(HTab &htab, HNode **from);
-
-    void startResizing();
-    void helpRehashing();
-
-    EqFn eq_;
-    DeleteFn deleter_;
-    HTab newer_;
-    HTab older_;  // non-empty only while a resize is in progress
-    size_t migratePos_ = 0;
+// An array of buckets. Its size is always a power of two, so the bucket for
+// a hash is (hash & mask), which is the same as hash % size but faster.
+struct Table {
+    vector<Node *> buckets;
+    size_t mask = 0;
+    size_t size = 0;  // number of nodes in this table
 };
 
-uint64_t hashBytes(const uint8_t *data, size_t len);
+// Chained hashtable that grows a little at a time, like Redis's dict.
+// When it gets too full, the current table becomes `older`, a new table twice
+// the size becomes `newer`, and every set/del moves a few nodes across.
+// So no single call ever has to move everything at once.
+struct HashMap {
+    Table newer;
+    Table older;         // only non-empty while nodes are being moved
+    size_t movePos = 0;  // next bucket of `older` to move
 
-#endif
+    bool get(const string &key, string &val);  // false if key is missing
+    void set(const string &key, const string &val);
+    bool del(const string &key);  // false if key was missing
+    size_t size();
+    void moveSomeNodes();
+};
+
+uint64_t hashString(const string &s);

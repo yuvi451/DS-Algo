@@ -1,65 +1,41 @@
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#pragma once
 
-#include <cstddef>
 #include <cstdint>
-#include <optional>
 #include <string>
-#include <string_view>
 #include <vector>
+using namespace std;
 
-// All integers on the wire are 32-bit in host byte order (little-endian on
-// x86/ARM). See README.md for the full message layout.
-constexpr size_t kMaxMsg = 4096;
-constexpr size_t kHeaderLen = 4;
-constexpr uint16_t kServerPort = 1234;
+// Every number on the wire is a 4-byte uint32_t, stored the way the CPU keeps
+// it in memory (little-endian on x86 and ARM). See README.md for the layout.
+//
+// We keep raw bytes in a plain std::string: a string can hold any bytes,
+// including 0, and already knows how to grow (+=) and shrink (erase).
+const size_t MAX_MSG = 4096;  // biggest payload we accept
+const size_t HEADER_LEN = 4;  // the length in front of every message
+const int PORT = 1234;
 
-enum class ResponseStatus : uint8_t {
-    Ok = 0,
-    Err = 1,
-    Nx = 2,
-};
+// First byte of every response.
+enum Status { RES_OK = 0, RES_ERR = 1, RES_NX = 2 };  // NX = key not found
 
-class Buffer {
-public:
-    void append(const uint8_t *data, size_t len);
-    void append(std::string_view s);
-    void consume(size_t n);  // drop n bytes from the front
+void appendU32(string &out, uint32_t v);        // add v's 4 bytes to the end of out
+uint32_t readU32(const string &s, size_t pos);  // read 4 bytes starting at s[pos]
 
-    const uint8_t *data() const { return buf_.data(); }
-    size_t size() const { return buf_.size(); }
+// Request payload: [nargs] then [len][bytes] for each arg.
+string encodeRequest(const vector<string> &args);
+bool parseRequest(const string &payload, vector<string> &args);  // false if malformed
 
-private:
-    std::vector<uint8_t> buf_;
-};
+// Response payload: [status byte] then, only if data is non-empty, [len][bytes].
+// So an empty value looks the same on the wire as "no value".
+string encodeResponse(Status status, const string &data = "");
+bool parseResponse(const string &payload, Status &status, string &data);
 
-// Request payload: [nargs] then [len][bytes] per arg.
-bool encodeRequest(Buffer &out, const std::vector<std::string> &args);  // false if > kMaxMsg
-std::optional<std::vector<std::string>> parseRequest(const uint8_t *data, size_t len);
+// Frame: [payload length][payload]. Every message on the socket is a frame.
+string makeFrame(const string &payload);
 
-// Response payload: [1-byte status] then, only if data is non-empty, [len][bytes].
-// So an empty-string value looks the same on the wire as "no value".
-void encodeResponse(Buffer &out, ResponseStatus status, std::string_view data = {});
-
-struct Response {
-    ResponseStatus status;
-    std::string data;
-};
-std::optional<Response> parseResponse(const uint8_t *data, size_t len);
-
-// Frame: [payload length][payload].
-void appendFrame(Buffer &out, const Buffer &payload);
-
-enum class FrameStatus {
-    Incomplete,  // wait for more bytes
-    Malformed,   // declared length exceeds kMaxMsg
-    Complete,
-};
-FrameStatus tryParseFrame(const uint8_t *buf, size_t len, size_t &payloadLen);
+enum FrameResult { FRAME_INCOMPLETE, FRAME_TOO_BIG, FRAME_COMPLETE };
+FrameResult tryParseFrame(const string &buf, size_t &payloadLen);
 
 // Blocking helpers used by the client and the load tester.
-int connectToServer();  // -1 on failure, errno set
-bool writeFrame(int fd, const Buffer &payload);
-std::optional<std::vector<uint8_t>> readFrame(int fd);  // returns the payload only
-
-#endif
+int connectToServer();  // returns the socket, or -1 on failure
+bool writeFrame(int fd, const string &payload);
+bool readFrame(int fd, string &payload);

@@ -1,186 +1,130 @@
 #include "protocol.h"
 
-#include <cassert>
-#include <cstring>
-
 #include <arpa/inet.h>
-#include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <sys/socket.h>
 #include <unistd.h>
 
-namespace {
-
-void appendU32(Buffer &out, uint32_t v) {
-    out.append(reinterpret_cast<const uint8_t *>(&v), 4);
+void appendU32(string &out, uint32_t v) {
+    out.append((char *)&v, 4);  // look at v as 4 raw bytes and copy them
 }
 
-uint32_t readU32(const uint8_t *data) {
+uint32_t readU32(const string &s, size_t pos) {
     uint32_t v;
-    std::memcpy(&v, data, 4);
+    s.copy((char *)&v, 4, pos);  // copy 4 bytes from s[pos] into v
     return v;
 }
 
-bool readFull(int fd, uint8_t *buf, size_t n) {
-    while (n > 0) {
-        ssize_t rv = read(fd, buf, n);
-        if (rv <= 0) {
-            return false;
-        }
-        n -= static_cast<size_t>(rv);
-        buf += rv;
+string encodeRequest(const vector<string> &args) {
+    string out;
+    appendU32(out, args.size());
+    for (const string &arg : args) {
+        appendU32(out, arg.size());
+        out += arg;
     }
-    return true;
+    return out;
 }
 
-bool writeAll(int fd, const uint8_t *buf, size_t n) {
-    while (n > 0) {
-        ssize_t rv = write(fd, buf, n);
-        if (rv <= 0) {
-            return false;
-        }
-        n -= static_cast<size_t>(rv);
-        buf += rv;
-    }
-    return true;
-}
-
-}  // namespace
-
-void Buffer::append(const uint8_t *data, size_t len) {
-    buf_.insert(buf_.end(), data, data + len);
-}
-
-void Buffer::append(std::string_view s) {
-    append(reinterpret_cast<const uint8_t *>(s.data()), s.size());
-}
-
-void Buffer::consume(size_t n) {
-    assert(n <= buf_.size());
-    buf_.erase(buf_.begin(), buf_.begin() + static_cast<long>(n));
-}
-
-bool encodeRequest(Buffer &out, const std::vector<std::string> &args) {
-    appendU32(out, static_cast<uint32_t>(args.size()));
-    for (const auto &arg : args) {
-        appendU32(out, static_cast<uint32_t>(arg.size()));
-        out.append(arg);
-    }
-    return out.size() <= kMaxMsg;
-}
-
-std::optional<std::vector<std::string>> parseRequest(const uint8_t *data, size_t len) {
-    if (len < 4) {
-        return std::nullopt;
-    }
-    uint32_t nargs = readU32(data);
-    if (nargs > 1024) {
-        return std::nullopt;
-    }
+// The bytes come from another program, so check every length before using it.
+bool parseRequest(const string &payload, vector<string> &args) {
+    if (payload.size() < 4) return false;
+    uint32_t nargs = readU32(payload, 0);
+    if (nargs > 1024) return false;
 
     size_t pos = 4;
-    std::vector<std::string> args;
-    args.reserve(nargs);
     for (uint32_t i = 0; i < nargs; i++) {
-        if (pos + 4 > len) {
-            return std::nullopt;
-        }
-        uint32_t l = readU32(data + pos);
+        if (pos + 4 > payload.size()) return false;
+        uint32_t len = readU32(payload, pos);
         pos += 4;
-        if (pos + l > len) {
-            return std::nullopt;
-        }
-        args.emplace_back(reinterpret_cast<const char *>(data + pos), l);
-        pos += l;
+        if (pos + len > payload.size()) return false;
+        args.push_back(payload.substr(pos, len));
+        pos += len;
     }
-    if (pos != len) {
-        return std::nullopt;
-    }
-    return args;
+    return pos == payload.size();  // no junk left over
 }
 
-void encodeResponse(Buffer &out, ResponseStatus status, std::string_view data) {
-    uint8_t s = static_cast<uint8_t>(status);
-    out.append(&s, 1);
+string encodeResponse(Status status, const string &data) {
+    string out;
+    out += (char)status;
     if (!data.empty()) {
-        appendU32(out, static_cast<uint32_t>(data.size()));
-        out.append(data);
+        appendU32(out, data.size());
+        out += data;
     }
+    return out;
 }
 
-std::optional<Response> parseResponse(const uint8_t *data, size_t len) {
-    if (len < 1) {
-        return std::nullopt;
-    }
-    auto status = static_cast<ResponseStatus>(data[0]);
-    if (len == 1) {
-        return Response{status, std::string()};
-    }
-    if (len < 5 || 5 + static_cast<size_t>(readU32(data + 1)) != len) {
-        return std::nullopt;
-    }
-    return Response{status, std::string(reinterpret_cast<const char *>(data + 5), len - 5)};
+bool parseResponse(const string &payload, Status &status, string &data) {
+    if (payload.empty()) return false;
+    status = (Status)payload[0];
+    data = "";
+    if (payload.size() == 1) return true;
+    if (payload.size() < 5 || 5 + readU32(payload, 1) != payload.size()) return false;
+    data = payload.substr(5);
+    return true;
 }
 
-void appendFrame(Buffer &out, const Buffer &payload) {
-    appendU32(out, static_cast<uint32_t>(payload.size()));
-    out.append(payload.data(), payload.size());
+string makeFrame(const string &payload) {
+    string out;
+    appendU32(out, payload.size());
+    return out + payload;
 }
 
-FrameStatus tryParseFrame(const uint8_t *buf, size_t len, size_t &payloadLen) {
-    if (len < kHeaderLen) {
-        return FrameStatus::Incomplete;
-    }
-    payloadLen = readU32(buf);
-    if (payloadLen > kMaxMsg) {
-        return FrameStatus::Malformed;
-    }
-    if (len < kHeaderLen + payloadLen) {
-        return FrameStatus::Incomplete;
-    }
-    return FrameStatus::Complete;
+// Is there a whole frame at the front of buf? Doesn't remove anything.
+FrameResult tryParseFrame(const string &buf, size_t &payloadLen) {
+    if (buf.size() < HEADER_LEN) return FRAME_INCOMPLETE;
+    payloadLen = readU32(buf, 0);
+    if (payloadLen > MAX_MSG) return FRAME_TOO_BIG;
+    if (buf.size() < HEADER_LEN + payloadLen) return FRAME_INCOMPLETE;
+    return FRAME_COMPLETE;
 }
 
 int connectToServer() {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (fd < 0) {
-        return -1;
-    }
-    int one = 1;
-    setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+    if (fd < 0) return -1;
+    int yes = 1;
+    setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));  // send small messages right away
 
-    sockaddr_in addr{};
+    sockaddr_in addr = {};
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(kServerPort);
-    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    if (connect(fd, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) != 0) {
+    addr.sin_port = htons(PORT);
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);  // 127.0.0.1
+    if (connect(fd, (sockaddr *)&addr, sizeof(addr)) != 0) {
         close(fd);
         return -1;
     }
     return fd;
 }
 
-bool writeFrame(int fd, const Buffer &payload) {
-    if (payload.size() > kMaxMsg) {
-        return false;
+// write() and read() may handle fewer bytes than asked, so loop until done.
+bool writeAll(int fd, const string &data) {
+    size_t done = 0;
+    while (done < data.size()) {
+        int n = write(fd, data.data() + done, data.size() - done);
+        if (n <= 0) return false;
+        done += n;
     }
-    Buffer frame;
-    appendFrame(frame, payload);
-    return writeAll(fd, frame.data(), frame.size());
+    return true;
 }
 
-std::optional<std::vector<uint8_t>> readFrame(int fd) {
-    uint8_t header[kHeaderLen];
-    if (!readFull(fd, header, kHeaderLen)) {
-        return std::nullopt;
+bool readExactly(int fd, size_t n, string &out) {
+    out.resize(n);
+    size_t done = 0;
+    while (done < n) {
+        int got = read(fd, &out[done], n - done);
+        if (got <= 0) return false;  // error, or the other side closed
+        done += got;
     }
-    uint32_t len = readU32(header);
-    if (len > kMaxMsg) {
-        return std::nullopt;
-    }
-    std::vector<uint8_t> payload(len);
-    if (!readFull(fd, payload.data(), len)) {
-        return std::nullopt;
-    }
-    return payload;
+    return true;
+}
+
+bool writeFrame(int fd, const string &payload) {
+    if (payload.size() > MAX_MSG) return false;
+    return writeAll(fd, makeFrame(payload));
+}
+
+bool readFrame(int fd, string &payload) {
+    string header;
+    if (!readExactly(fd, HEADER_LEN, header)) return false;
+    uint32_t len = readU32(header, 0);
+    if (len > MAX_MSG) return false;
+    return readExactly(fd, len, payload);
 }

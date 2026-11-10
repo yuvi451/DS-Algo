@@ -1,124 +1,124 @@
 #include "hashtable.h"
 
-#include <cassert>
+const size_t INIT_SIZE = 4;        // buckets in a brand new table
+const size_t MAX_LOAD = 8;         // grow when there are 8 nodes per bucket on average
+const size_t MOVE_PER_CALL = 128;  // nodes moved per set/del while growing
 
-namespace {
-constexpr size_t kInitSize = 4;
-constexpr size_t kMaxLoadFactor = 8;
-constexpr size_t kRehashWork = 128;  // entries migrated per insert/pop
-}  // namespace
-
-void HMap::htabInit(HTab &htab, size_t n) {
-    assert(n > 0 && ((n - 1) & n) == 0);  // n must be a power of two
-    htab.tab.assign(n, nullptr);
-    htab.mask = n - 1;
-    htab.size = 0;
-}
-
-void HMap::htabInsert(HTab &htab, HNode *node) {
-    size_t pos = node->hcode & htab.mask;
-    node->next = htab.tab[pos];
-    htab.tab[pos] = node;
-    htab.size++;
-}
-
-// Returns the slot pointing at the matching node, so the caller can unlink it.
-HNode **HMap::htabLookup(HTab &htab, const HNode *key, EqFn eq) {
-    if (htab.tab.empty()) {
-        return nullptr;
-    }
-    HNode **from = &htab.tab[key->hcode & htab.mask];
-    for (HNode *cur; (cur = *from) != nullptr; from = &cur->next) {
-        if (cur->hcode == key->hcode && eq(cur, key)) {
-            return from;
-        }
-    }
-    return nullptr;
-}
-
-HNode *HMap::htabDetach(HTab &htab, HNode **from) {
-    HNode *node = *from;
-    *from = node->next;
-    htab.size--;
-    return node;
-}
-
-void HMap::startResizing() {
-    assert(older_.tab.empty());
-    older_ = std::move(newer_);
-    htabInit(newer_, (older_.mask + 1) * 2);
-    migratePos_ = 0;
-}
-
-void HMap::helpRehashing() {
-    size_t nwork = 0;
-    while (nwork < kRehashWork && older_.size > 0) {
-        HNode **from = &older_.tab[migratePos_];
-        if (!*from) {
-            migratePos_++;
-            continue;
-        }
-        htabInsert(newer_, htabDetach(older_, from));
-        nwork++;
-    }
-    if (older_.size == 0 && !older_.tab.empty()) {
-        older_ = HTab{};
-    }
-}
-
-HMap::~HMap() {
-    for (HTab *htab : {&newer_, &older_}) {
-        for (HNode *node : htab->tab) {
-            while (node) {
-                HNode *next = node->next;
-                deleter_(node);
-                node = next;
-            }
-        }
-    }
-}
-
-void HMap::insert(HNode *node) {
-    if (newer_.tab.empty()) {
-        htabInit(newer_, kInitSize);
-    }
-    htabInsert(newer_, node);
-
-    bool resizing = !older_.tab.empty();
-    if (!resizing && newer_.size >= (newer_.mask + 1) * kMaxLoadFactor) {
-        startResizing();
-    }
-    helpRehashing();
-}
-
-HNode *HMap::lookup(const HNode *key) const {
-    // htabLookup hands out a mutable slot for pop(); here we only read it.
-    auto *self = const_cast<HMap *>(this);
-    for (HTab *htab : {&self->newer_, &self->older_}) {
-        if (HNode **from = htabLookup(*htab, key, eq_)) {
-            return *from;
-        }
-    }
-    return nullptr;
-}
-
-HNode *HMap::pop(const HNode *key) {
-    for (HTab *htab : {&newer_, &older_}) {
-        if (HNode **from = htabLookup(*htab, key, eq_)) {
-            HNode *node = htabDetach(*htab, from);
-            helpRehashing();
-            return node;
-        }
-    }
-    return nullptr;
-}
-
-// FNV-1a
-uint64_t hashBytes(const uint8_t *data, size_t len) {
+// FNV-1a: a simple, fast hash for strings.
+uint64_t hashString(const string &s) {
     uint64_t h = 0xcbf29ce484222325ULL;
-    for (size_t i = 0; i < len; i++) {
-        h ^= data[i];
+    for (char c : s) {
+        h ^= (unsigned char)c;
         h *= 0x100000001b3ULL;
     }
     return h;
+}
+
+void initTable(Table &t, size_t n) {
+    t.buckets.assign(n, nullptr);  // n empty buckets
+    t.mask = n - 1;
+    t.size = 0;
+}
+
+// Push node onto the front of its bucket's list.
+void addNode(Table &t, Node *node) {
+    size_t i = node->hash & t.mask;
+    node->next = t.buckets[i];
+    t.buckets[i] = node;
+    t.size++;
+}
+
+Node *findNode(Table &t, const string &key, uint64_t hash) {
+    if (t.buckets.empty()) return nullptr;
+    for (Node *n = t.buckets[hash & t.mask]; n != nullptr; n = n->next) {
+        if (n->hash == hash && n->key == key) return n;
+    }
+    return nullptr;
+}
+
+// Unlinks the node with this key from t and returns it, or nullptr.
+Node *removeNode(Table &t, const string &key, uint64_t hash) {
+    if (t.buckets.empty()) return nullptr;
+    size_t i = hash & t.mask;
+    Node *prev = nullptr;
+    Node *n = t.buckets[i];
+    while (n != nullptr) {
+        if (n->hash == hash && n->key == key) {
+            if (prev == nullptr) {
+                t.buckets[i] = n->next;  // it was the first node
+            } else {
+                prev->next = n->next;
+            }
+            t.size--;
+            return n;
+        }
+        prev = n;
+        n = n->next;
+    }
+    return nullptr;
+}
+
+// Moves up to MOVE_PER_CALL nodes from `older` to `newer`.
+void HashMap::moveSomeNodes() {
+    size_t moved = 0;
+    while (moved < MOVE_PER_CALL && older.size > 0) {
+        Node *n = older.buckets[movePos];
+        if (n == nullptr) {
+            movePos++;  // this bucket is empty, go to the next one
+            continue;
+        }
+        older.buckets[movePos] = n->next;  // take the first node of the bucket
+        older.size--;
+        addNode(newer, n);
+        moved++;
+    }
+    if (older.size == 0 && !older.buckets.empty()) {
+        older = Table();  // everything moved: free the old bucket array
+    }
+}
+
+bool HashMap::get(const string &key, string &val) {
+    uint64_t hash = hashString(key);
+    Node *n = findNode(newer, key, hash);
+    if (n == nullptr) n = findNode(older, key, hash);
+    if (n == nullptr) return false;
+    val = n->val;
+    return true;
+}
+
+void HashMap::set(const string &key, const string &val) {
+    uint64_t hash = hashString(key);
+    Node *n = findNode(newer, key, hash);
+    if (n == nullptr) n = findNode(older, key, hash);
+    if (n != nullptr) {
+        n->val = val;  // key exists: overwrite
+        return;
+    }
+
+    if (newer.buckets.empty()) initTable(newer, INIT_SIZE);
+    addNode(newer, new Node{key, val, hash, nullptr});
+
+    // Too full? Start growing: the full table becomes `older`, and an empty
+    // table twice as big becomes `newer`. swap() just trades the two tables.
+    bool growing = !older.buckets.empty();
+    if (!growing && newer.size >= newer.buckets.size() * MAX_LOAD) {
+        swap(older, newer);
+        initTable(newer, older.buckets.size() * 2);
+        movePos = 0;
+    }
+    moveSomeNodes();
+}
+
+bool HashMap::del(const string &key) {
+    uint64_t hash = hashString(key);
+    Node *n = removeNode(newer, key, hash);
+    if (n == nullptr) n = removeNode(older, key, hash);
+    if (n == nullptr) return false;
+    delete n;
+    moveSomeNodes();
+    return true;
+}
+
+size_t HashMap::size() {
+    return newer.size + older.size;
 }
